@@ -1,23 +1,39 @@
-import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class UberServer {
     public static List<ClientInfo> customers = Collections.synchronizedList(new ArrayList<>());
     public static List<ClientInfo> drivers = Collections.synchronizedList(new ArrayList<>());
+    public static List<User> users = Collections.synchronizedList(new ArrayList<>());
+    public static List<Ride> rides = Collections.synchronizedList(new ArrayList<>());
+    public static Map<String, DataOutputStream> driverOutputs = Collections.synchronizedMap(new HashMap<>());
+    public static Map<String, Boolean> driverAvailability = Collections.synchronizedMap(new HashMap<>());
+    public static Map<String, DataOutputStream> customerOutputs = Collections.synchronizedMap(new HashMap<>());
+
+
+    public static int rideIdCounter = 1;
+
     public static int customerId = 1;
     public static int driverId = 1;
-    public static synchronized int addCustomer(String address) {
+    static {
+        // Predefined admin user
+        users.add(new User("admin", "admin123", "admin"));
+    }
+    public static synchronized int addCustomer(String address, String username, DataOutputStream out) {
         int id = customerId++;
         customers.add(new ClientInfo(id, "customer", address));
+        customerOutputs.put(username,out);
         return id;
     }
-    public static synchronized int addDriver(String address) {
+
+    public static synchronized int addDriver(String address, String username, DataOutputStream out) {
         int id = driverId++;
         drivers.add(new ClientInfo(id, "driver", address));
+        driverOutputs.put(username,out);
+        driverAvailability.put(username,true);
+
         return id;
     }
 
