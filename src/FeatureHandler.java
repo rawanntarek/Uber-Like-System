@@ -54,10 +54,48 @@ public class FeatureHandler {
             String message = input.readUTF();
 
             if (message.startsWith("fare:")) {
-                output.writeUTF("fare");
-                // Placeholder for fare offer logic
+                if (!UberServer.driverAvailability.get(username)) {
+                    output.writeUTF("You are already involved in a ride or waiting for assignment. Cannot offer multiple fares.");
+                    continue;
+                }
 
-            } else if (message.equals("start") || message.equals("end")) {
+                // Find the latest ride (or better, find the ride by ID in future)
+                Ride latestRide = null;
+                synchronized (UberServer.rides) {
+                    for (int i = UberServer.rides.size() - 1; i >= 0; i--) {
+                        Ride r = UberServer.rides.get(i);
+                        if (r.getStatus().equals("pending")) {
+                            latestRide = r;
+                            break;
+                        }
+                    }
+                }
+
+                if (latestRide == null) {
+                    output.writeUTF("No available ride to offer a fare for.");
+                } else {
+                    String[] parts = message.split(":");
+                    int fare = Integer.parseInt(parts[1].trim());
+                    latestRide.addFareOffer(username, fare);
+                    UberServer.driverAvailability.put(username, false); // Mark driver as unavailable
+
+                    output.writeUTF("Fare of " + fare + " sent for ride ID: " + latestRide.getRideId());
+                    System.out.println("Driver " + username + " offered fare " + fare + " for Ride " + latestRide.getRideId());
+
+                    // Notify the customer of the new fare
+                    String customerUsername = latestRide.getCustomerUsername();
+                    DataOutputStream customerOut = UberServer.customerOutputs.get(customerUsername);
+                    if (customerOut != null) {
+                        try {
+                            customerOut.writeUTF(" New fare offer: " + username + " offered " + fare +
+                                    " for your ride (Ride ID: " + latestRide.getRideId() + ")");
+                        } catch (IOException e) {
+                            System.out.println("Failed to notify customer: " + customerUsername);
+                        }
+                    }
+                }
+            }
+            else if (message.equals("start") || message.equals("end")) {
                 output.writeUTF("ride");
                 // Placeholder for ride status logic
 

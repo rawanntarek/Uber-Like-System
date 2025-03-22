@@ -76,7 +76,8 @@ public class ClientHandler implements Runnable {
             String address = socket.getInetAddress().toString();
 
             if (role.equals("customer")) {
-                int id = UberServer.addCustomer(address);
+                int id = UberServer.addCustomer(address, username, output);
+
                 System.out.println("Customer connected with ID: " + id);
                 FeatureHandler.handleCustomerFeatures(input, output, username, id);
 

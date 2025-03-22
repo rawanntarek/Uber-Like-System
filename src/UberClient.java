@@ -86,6 +86,19 @@ public class UberClient {
                 }
 
             } else if (role.equals("customer")) {
+
+                new Thread(() -> {
+                    try {
+                        while (true) {
+                            String msg = input.readUTF();
+                            System.out.println("\n📢 Server: " + msg);
+                            System.out.print("Choose an option: ");
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Disconnected from server.");
+                    }
+                }).start();
+
                 int choice = 0;
                 while (choice != 3) {
                     System.out.println("Customer Menu:");
@@ -103,11 +116,9 @@ public class UberClient {
                             System.out.print("Enter Destination: ");
                             String dest = scanner.nextLine();
                             output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
-                            System.out.println("Server: " + input.readUTF());
                             break;
                         case 2:
-                            output.writeUTF("view status");
-                            System.out.println("Server: " + input.readUTF());
+                            output.writeUTF("viewStatus");
                             break;
                         case 3:
                             output.writeUTF("exit");
@@ -117,7 +128,8 @@ public class UberClient {
                             System.out.println("Invalid choice");
                     }
                 }
-            } else if (role.equals("admin")) {
+            }
+ else if (role.equals("admin")) {
                 System.out.println("Admin menu coming soon...");
             }
 

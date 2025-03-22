@@ -9,6 +9,10 @@ public class UberServer {
     public static List<User> users = Collections.synchronizedList(new ArrayList<>());
     public static List<Ride> rides = Collections.synchronizedList(new ArrayList<>());
     public static Map<String, DataOutputStream> driverOutputs = Collections.synchronizedMap(new HashMap<>());
+    public static Map<String, Boolean> driverAvailability = Collections.synchronizedMap(new HashMap<>());
+    public static Map<String, DataOutputStream> customerOutputs = Collections.synchronizedMap(new HashMap<>());
+
+
     public static int rideIdCounter = 1;
 
     public static int customerId = 1;
@@ -17,9 +21,10 @@ public class UberServer {
         // Predefined admin user
         users.add(new User("admin", "admin123", "admin"));
     }
-    public static synchronized int addCustomer(String address) {
+    public static synchronized int addCustomer(String address, String username, DataOutputStream out) {
         int id = customerId++;
         customers.add(new ClientInfo(id, "customer", address));
+        customerOutputs.put(username,out);
         return id;
     }
 
@@ -27,6 +32,7 @@ public class UberServer {
         int id = driverId++;
         drivers.add(new ClientInfo(id, "driver", address));
         driverOutputs.put(username,out);
+        driverAvailability.put(username,true);
 
         return id;
     }
