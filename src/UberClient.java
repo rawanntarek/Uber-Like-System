@@ -8,45 +8,50 @@ public class UberClient {
     public static void main(String[] args) {
         try {
             Socket socket = new Socket("127.0.0.1", 6660);
-            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
-            //equalsIgnoreCase() is a method in Java that compares two strings ignoring case sensitivity.
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            DataInputStream input = new DataInputStream(socket.getInputStream());
             Scanner scanner = new Scanner(System.in);
-//
-            // Handle login/register
-            System.out.println(dataInputStream.readUTF()); // Do you want to login or register?
+
+            System.out.println(input.readUTF());
             String action = scanner.nextLine();
-            dataOutputStream.writeUTF(action);
+            output.writeUTF(action);
 
-            System.out.print(dataInputStream.readUTF()); // Enter username:
+            System.out.print(input.readUTF());
             String username = scanner.nextLine();
-            dataOutputStream.writeUTF(username);
+            output.writeUTF(username);
 
-            System.out.print(dataInputStream.readUTF()); // Enter password:
+            System.out.print(input.readUTF());
             String password = scanner.nextLine();
-            dataOutputStream.writeUTF(password);
+            output.writeUTF(password);
 
             if (action.equalsIgnoreCase("register")) {
-                System.out.print(dataInputStream.readUTF()); // Are you a customer or driver?
+                System.out.print(input.readUTF());
                 String role = scanner.nextLine();
-                dataOutputStream.writeUTF(role);
+                output.writeUTF(role);
             }
 
-            String response = dataInputStream.readUTF();
+            String response = input.readUTF();
             System.out.println("Server: " + response);
             if (response.contains("Disconnecting")) return;
 
-            // Determine role
             String role = "";
-            if (response.toLowerCase().contains("customer")) {
-                role = "customer";
-            } else if (response.toLowerCase().contains("driver")) {
-                role = "driver";
-            } else if (response.toLowerCase().contains("admin")) {
-                role = "admin";
-            }
+            if (response.toLowerCase().contains("customer")) role = "customer";
+            else if (response.toLowerCase().contains("driver")) role = "driver";
+            else if (response.toLowerCase().contains("admin")) role = "admin";
 
             if (role.equals("driver")) {
+                new Thread(() -> {
+                    try {
+                        while (true) {
+                            String serverMsg = input.readUTF();
+                            System.out.println( serverMsg);
+
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Disconnected from server.");
+                    }
+                }).start();
+
                 int choice = 0;
                 while (choice != 3) {
                     System.out.println("Driver Menu:");
@@ -61,23 +66,25 @@ public class UberClient {
                         case 1:
                             System.out.print("Offer a fare: ");
                             int fare = scanner.nextInt();
-                            dataOutputStream.writeUTF("fare: " + fare);
-                            System.out.println("Server: " + dataInputStream.readUTF());
+                            scanner.nextLine();
+                            output.writeUTF("fare: " + fare);
+                            System.out.println("Server: " + input.readUTF());
                             break;
                         case 2:
                             System.out.print("Enter ride status (start/end): ");
                             String status = scanner.nextLine();
-                            dataOutputStream.writeUTF(status);
-                            System.out.println("Server: " + dataInputStream.readUTF());
+                            output.writeUTF(status);
+                            System.out.println("Server: " + input.readUTF());
                             break;
                         case 3:
-                            dataOutputStream.writeUTF("exit");
+                            output.writeUTF("exit");
                             System.out.println("Disconnecting...");
                             break;
                         default:
                             System.out.println("Invalid choice");
                     }
                 }
+
             } else if (role.equals("customer")) {
                 int choice = 0;
                 while (choice != 3) {
@@ -95,15 +102,15 @@ public class UberClient {
                             String pickup = scanner.nextLine();
                             System.out.print("Enter Destination: ");
                             String dest = scanner.nextLine();
-                            dataOutputStream.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
-                            System.out.println("Server: " + dataInputStream.readUTF());
+                            output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
+                            System.out.println("Server: " + input.readUTF());
                             break;
                         case 2:
-                            dataOutputStream.writeUTF("view status");
-                            System.out.println("Server: " + dataInputStream.readUTF());
+                            output.writeUTF("view status");
+                            System.out.println("Server: " + input.readUTF());
                             break;
                         case 3:
-                            dataOutputStream.writeUTF("exit");
+                            output.writeUTF("exit");
                             System.out.println("Disconnecting...");
                             break;
                         default:
@@ -115,8 +122,8 @@ public class UberClient {
             }
 
             scanner.close();
-            dataOutputStream.close();
-            dataInputStream.close();
+            output.close();
+            input.close();
             socket.close();
 
         } catch (Exception e) {

@@ -1,13 +1,16 @@
+import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class UberServer {
     public static List<ClientInfo> customers = Collections.synchronizedList(new ArrayList<>());
     public static List<ClientInfo> drivers = Collections.synchronizedList(new ArrayList<>());
     public static List<User> users = Collections.synchronizedList(new ArrayList<>());
+    public static List<Ride> rides = Collections.synchronizedList(new ArrayList<>());
+    public static Map<String, DataOutputStream> driverOutputs = Collections.synchronizedMap(new HashMap<>());
+    public static int rideIdCounter = 1;
+
     public static int customerId = 1;
     public static int driverId = 1;
     static {
@@ -20,9 +23,10 @@ public class UberServer {
         return id;
     }
 
-    public static synchronized int addDriver(String address) {
+    public static synchronized int addDriver(String address, String username, DataOutputStream out) {
         int id = driverId++;
         drivers.add(new ClientInfo(id, "driver", address));
+        driverOutputs.put(username,out);
 
         return id;
     }
