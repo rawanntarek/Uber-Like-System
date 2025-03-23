@@ -31,7 +31,10 @@ public class UberClient {
             }
 
             String response = input.readUTF();
+            System.out.println("---------------------------------------");
             System.out.println("Server: " + response);
+            System.out.println("---------------------------------------");
+
             if (response.contains("Disconnecting")) return;
             String[] tokens = response.toLowerCase().replace(".", "").split(" ");
             String role = tokens[tokens.length - 1];
@@ -144,9 +147,13 @@ public class UberClient {
                                     }
                                 }
                                 else {
+                                    System.out.println("---------------------------------------");
+                                    System.out.println(offer);
+                                    System.out.println("---------------------------------------");
                                     break;
                                 }
                             }
+
                             break;
                         case 2:
                             output.writeUTF("viewStatus");
