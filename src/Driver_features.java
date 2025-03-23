@@ -74,10 +74,16 @@ public class Driver_features {
                 if (status.equals("start")) {
                     r.setStatus("in progress");
                     output.writeUTF("Ride started for Ride ID: " + r.getRideId());
+                    DataOutputStream customerOut = UberServer.customerOutputs.get(r.getCustomerUsername());
+                    customerOut.writeUTF("Your ride started with "+driverUsername);
+
+
 
                 } else if (status.equals("end")) {
                     r.setStatus("completed");
                     output.writeUTF("Ride completed for Ride ID: " + r.getRideId());
+                    DataOutputStream customerOut = UberServer.customerOutputs.get(r.getCustomerUsername());
+                    customerOut.writeUTF("Your ride completed with "+driverUsername);
                     UberServer.driverAvailability.put(driverUsername, true);
                 }
 
