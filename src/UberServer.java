@@ -11,6 +11,7 @@ public class UberServer {
     public static Map<String, DataOutputStream> driverOutputs = Collections.synchronizedMap(new HashMap<>());
     public static Map<String, Boolean> driverAvailability = Collections.synchronizedMap(new HashMap<>());
     public static Map<String, DataOutputStream> customerOutputs = Collections.synchronizedMap(new HashMap<>());
+    public static Map<String, Offer> pendingCustomerOffers = Collections.synchronizedMap(new HashMap<>());
 
 
     public static int rideIdCounter = 1;

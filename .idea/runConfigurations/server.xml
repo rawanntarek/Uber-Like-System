@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="server" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="UberServer" />
+    <module name="Uber-like system" />
+    <method v="2" />
+  </configuration>
+</component>

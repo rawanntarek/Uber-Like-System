@@ -87,9 +87,22 @@ public class UberClient {
 
                 new Thread(() -> {
                     try {
+                        Scanner sc = new Scanner(System.in);
+
                         while (true) {
                             String msg = input.readUTF();
                             System.out.println("\n" + msg);
+
+                            if (msg.startsWith("Offer:")) {
+                                System.out.print("Do you want to accept this offer? (yes/no): ");
+                                String answer = sc.nextLine();
+                                if(answer.equalsIgnoreCase("yes"))
+                                {
+                                    output.writeUTF("acceptOffer");
+                                } else if (answer.equalsIgnoreCase("no")) {
+                                    output.writeUTF("declineOffer");
+                                }
+                            }
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");

@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="driver 1" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="UberClient" />
+    <module name="Uber-like system" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

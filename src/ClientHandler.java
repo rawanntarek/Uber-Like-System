@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.Driver;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -85,15 +86,15 @@ public class ClientHandler implements Runnable {
                 int id = UberServer.addCustomer(address, username, output);
 
                 System.out.println("Customer connected with ID: " + id);
-                FeatureHandler.handleCustomerFeatures(input, output, username, id);
+                Customer_Features.handleCustomerFeatures(input, output, username, id);
 
             } else if (role.equals("driver")) {
                 int id = UberServer.addDriver(address, username, output);
                 System.out.println("Driver connected with ID: " + id);
-                FeatureHandler.handleDriverFeatures(input, output, username, id);
+                Driver_features.handleDriverFeatures(input, output, username, id);
 
             } else if (role.equals("admin")) {
-                FeatureHandler.handleAdminFeatures(output);
+                //FeatureHandler.handleAdminFeatures(output);
             }
 
             System.out.println("Client disconnected.");

@@ -50,10 +50,11 @@ public class Ride {
         return fareOffers;
     }
 
-    public void assignDriver(String driver) {
+    public void setAssignedDriver(String driver) {
         this.assignedDriver = driver;
         this.status = "assigned";
     }
+
 
     public String getAssignedDriver() {
         return assignedDriver;
