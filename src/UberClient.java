@@ -12,8 +12,6 @@ public class UberClient {
             DataInputStream input = new DataInputStream(socket.getInputStream());
             Scanner scanner = new Scanner(System.in);
 
-
-
             System.out.println(input.readUTF());
             String action = scanner.nextLine();
             output.writeUTF(action);
@@ -86,22 +84,26 @@ public class UberClient {
                 }
 
             } else if (role.equals("customer")) {
-                final boolean[] rideJustCompleted = {false};
-                final StringBuilder pendingOffer = new StringBuilder();
+
                 new Thread(() -> {
                     try {
+                        Scanner sc = new Scanner(System.in);
+
                         while (true) {
                             String msg = input.readUTF();
-                            System.out.println("Server: " + msg);
-
-                            if (msg.toLowerCase().contains("your ride completed")) {
-                                rideJustCompleted[0] = true;
-                            }
+                            System.out.println("\n" + msg);
 
                             if (msg.startsWith("Offer:")) {
-                                pendingOffer.setLength(0);
-                                pendingOffer.append(msg);
+                                System.out.print("Do you want to accept this offer? (yes/no): ");
+                                String answer = sc.nextLine();
+                                if(answer.equalsIgnoreCase("yes"))
+                                {
+                                    output.writeUTF("acceptOffer");
+                                } else if (answer.equalsIgnoreCase("no")) {
+                                    output.writeUTF("declineOffer");
+                                }
                             }
+
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
@@ -109,54 +111,35 @@ public class UberClient {
                 }).start();
 
                 int choice = 0;
-                while (true) {
-
-                    if (rideJustCompleted[0]) {
-                        rideJustCompleted[0] = false;
-                        System.out.println("\n✅ Your ride is now complete.");
-                    }
-
-
-                    if (pendingOffer.length() > 0) {
-                        System.out.println("\n📨 " + pendingOffer);
-                        System.out.print("Do you want to accept this offer? (yes/no): ");
-                        String answer = scanner.nextLine();
-                        if (answer.equalsIgnoreCase("yes")) {
-                            output.writeUTF("acceptOffer");
-                        } else if (answer.equalsIgnoreCase("no")) {
-                            output.writeUTF("declineOffer");
-                        }
-                        pendingOffer.setLength(0);
-                        continue; // skip menu to handle new input
-                    }
-
-
-                    System.out.println("\nCustomer Menu:");
+                while (choice != 3) {
+                    System.out.println("Customer Menu:");
                     System.out.println("1. Request a ride");
                     System.out.println("2. View ride status");
                     System.out.println("3. Disconnect from server.");
                     System.out.print("Choose an option: ");
+                    choice = scanner.nextInt();
+                    scanner.nextLine();
 
-                    String inputStr = scanner.nextLine();
-
-                    if (inputStr.equals("1")) {
-                        System.out.print("Enter Pickup Location: ");
-                        String pickup = scanner.nextLine();
-                        System.out.print("Enter Destination: ");
-                        String dest = scanner.nextLine();
-                        output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
-                    } else if (inputStr.equals("2")) {
-                        output.writeUTF("viewStatus");
-                    } else if (inputStr.equals("3")) {
-                        output.writeUTF("exit");
-                        System.out.println("Disconnecting...");
-                        break;
-                    } else {
-                        System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+                    switch (choice) {
+                        case 1:
+                            System.out.print("Enter Pickup Location: ");
+                            String pickup = scanner.nextLine();
+                            System.out.print("Enter Destination: ");
+                            String dest = scanner.nextLine();
+                            output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
+                            break;
+                        case 2:
+                            output.writeUTF("viewStatus");
+                            break;
+                        case 3:
+                            output.writeUTF("exit");
+                            System.out.println("Disconnecting...");
+                            break;
+                        default:
+                            System.out.println("Invalid choice");
                     }
                 }
             }
-
             else if (role.equals("admin")) {
                 System.out.println("Admin menu coming soon...");
             }
