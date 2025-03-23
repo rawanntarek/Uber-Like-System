@@ -46,7 +46,7 @@ public class Driver_features {
 
             output.writeUTF("Offer:" + fare + " sent for ride ID: " + latestRide.getRideId());
             Offer offer = new Offer(username, latestRide.getRideId(), fare);
-            UberServer.pendingCustomerOffers.put(latestRide.getCustomerUsername(), offer);
+           
 
 
             System.out.println("Offer:" + username + " offered fare " + fare + " for Ride " + latestRide.getRideId());
