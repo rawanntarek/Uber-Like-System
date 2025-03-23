@@ -36,29 +36,39 @@ public class UberClient {
             String[] tokens = response.toLowerCase().replace(".", "").split(" ");
             String role = tokens[tokens.length - 1];
 
+            if(role.equals("driver"))
+            {
+                System.out.println("Driver Menu:");
+                System.out.println("1. Offer a fare for a ride request");
+                System.out.println("2. Send status updates of the ride (start/end)");
+                System.out.println("3. Disconnect from the server.");
+                System.out.print("Choose an option: ");
+            }
 
             if (role.equals("driver")) {
                 new Thread(() -> {
                     try {
                         while (true) {
                             String serverMsg = input.readUTF();
-                            System.out.println("\n"+serverMsg);
+                            System.out.println("---------------------------------------");
+                            System.out.println(serverMsg);
+                            System.out.println("---------------------------------------");
+                            System.out.println("Driver Menu:");
+                            System.out.println("1. Offer a fare for a ride request");
+                            System.out.println("2. Send status updates of the ride (start/end)");
+                            System.out.println("3. Disconnect from the server.");
+                            System.out.println("Choose an option: ");
 
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
                     }
                 }).start();
-                System.out.println("Listening for incoming messages...");
 
 
                 int choice = 0;
                 while (choice != 3) {
-                    System.out.println("Driver Menu:");
-                    System.out.println("1. Offer a fare for a ride request");
-                    System.out.println("2. Send status updates of the ride (start/end)");
-                    System.out.println("3. Disconnect from the server.");
-                    System.out.print("Choose an option: ");
+
                     choice = scanner.nextInt();
                     scanner.nextLine();
 
@@ -91,19 +101,9 @@ public class UberClient {
 
                         while (true) {
                             String msg = input.readUTF();
-                            System.out.println("\n" + msg);
-
-                            if (msg.startsWith("Offer:")) {
-                                System.out.print("Do you want to accept this offer? (yes/no): ");
-                                String answer = sc.nextLine();
-                                if(answer.equalsIgnoreCase("yes"))
-                                {
-                                    output.writeUTF("acceptOffer");
-                                } else if (answer.equalsIgnoreCase("no")) {
-                                    output.writeUTF("declineOffer");
-                                }
-                            }
-
+                            System.out.println("---------------------------------------");
+                            System.out.println(msg);
+                            System.out.println("---------------------------------------");
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
@@ -112,11 +112,13 @@ public class UberClient {
 
                 int choice = 0;
                 while (choice != 3) {
+
                     System.out.println("Customer Menu:");
                     System.out.println("1. Request a ride");
                     System.out.println("2. View ride status");
                     System.out.println("3. Disconnect from server.");
-                    System.out.print("Choose an option: ");
+                    System.out.println("Choose an option: ");
+
                     choice = scanner.nextInt();
                     scanner.nextLine();
 
@@ -127,6 +129,24 @@ public class UberClient {
                             System.out.print("Enter Destination: ");
                             String dest = scanner.nextLine();
                             output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
+                            while(true)
+                            {
+                                String offer=input.readUTF();
+                                System.out.println(offer);
+                                if (offer.startsWith("Offer:")) {
+                                    System.out.print("Do you want to accept this offer? (yes/no): ");
+                                    String answer = scanner.nextLine();
+                                    if(answer.equalsIgnoreCase("yes"))
+                                    {
+                                        output.writeUTF("acceptOffer");
+                                    } else if (answer.equalsIgnoreCase("no")) {
+                                        output.writeUTF("declineOffer");
+                                    }
+                                }
+                                else {
+                                    break;
+                                }
+                            }
                             break;
                         case 2:
                             output.writeUTF("viewStatus");
