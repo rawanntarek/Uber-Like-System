@@ -11,7 +11,7 @@ public class Driver_features {
             if (message.startsWith("fare:")) {
                 handleFareOffer(message, username, output);
             } else if (message.equals("start") || message.equals("end")) {
-                output.writeUTF("ride");
+                updateRideStatus(username,message, output);
             } else if (message.equals("exit")) {
                 output.writeUTF("exit");
                 break;
@@ -63,4 +63,31 @@ public class Driver_features {
             }
         }
     }
+    private static void updateRideStatus(String driverUsername, String status, DataOutputStream output) throws IOException {
+        boolean found = false;
+
+        for (Ride r : UberServer.rides) {
+            if (driverUsername.equals(r.getAssignedDriver()) && (
+                    r.getStatus().equals("assigned") )) {
+
+                if (status.equals("start")) {
+                    r.setStatus("in progress");
+                    output.writeUTF("Ride started for Ride ID: " + r.getRideId());
+
+                } else if (status.equals("end")) {
+                    r.setStatus("completed");
+                    output.writeUTF("Ride completed for Ride ID: " + r.getRideId());
+                    UberServer.driverAvailability.put(driverUsername, true);
+                }
+
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            output.writeUTF("No assigned ride found to update");
+        }
+    }
+
 }
