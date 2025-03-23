@@ -103,6 +103,7 @@ public class UberClient {
                                     output.writeUTF("declineOffer");
                                 }
                             }
+
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");

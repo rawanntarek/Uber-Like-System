@@ -67,8 +67,9 @@ public class Driver_features {
         boolean found = false;
 
         for (Ride r : UberServer.rides) {
-            if (driverUsername.equals(r.getAssignedDriver()) && (
-                    r.getStatus().equals("assigned") )) {
+            if (driverUsername.equals(r.getAssignedDriver()) &&
+                    ((status.equals("start") && r.getStatus().equals("assigned")) ||
+                            (status.equals("end") && r.getStatus().equals("in progress")))) {
 
                 if (status.equals("start")) {
                     r.setStatus("in progress");
