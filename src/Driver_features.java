@@ -39,6 +39,7 @@ public class Driver_features {
 
         if (latestRide == null) {
             output.writeUTF("No available ride to offer a fare for.");
+
         } else {
             int fare = Integer.parseInt(message.split(":")[1].trim());
             latestRide.addFareOffer(username, fare);

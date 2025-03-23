@@ -18,10 +18,16 @@ public class Customer_Features {
             } else if (message.equals("declineOffer")) {
                 declineOffer(username, output);
             } else if (message.equals("viewStatus")) {
-                output.writeUTF("View status feature not implemented yet.");
+                viewRideStatus(username, output);
             } else if (message.equals("exit")) {
-                output.writeUTF("exit");
-                break;
+                if(disconnect(username))
+                {
+                    output.writeUTF("exit");
+                    break;
+                }
+                else {
+                    output.writeUTF("cannot disconnect your ride is on going");
+                }
             } else {
                 output.writeUTF("Unknown command.");
                 System.out.println("Unknown customer message: " + message);
@@ -133,6 +139,41 @@ public class Customer_Features {
             output.writeUTF("No more offers available for your ride.");
         }
     }
+    private static void viewRideStatus(String username, DataOutputStream output) throws IOException {
+        Ride latestRide = null;
+
+        for (int i = UberServer.rides.size() - 1; i >= 0; i--) {
+            Ride r = UberServer.rides.get(i);
+            if (r.getCustomerUsername().equals(username)) {
+                latestRide = r;
+                break;
+            }
+        }
+
+        if (latestRide == null) {
+            output.writeUTF("You have not requested any rides yet.");
+            return;
+        }
+
+        String status = latestRide.getStatus();
+        String response = "Your ride (Ride ID: " + latestRide.getRideId() + ") is currently '" + status + "',"+" Assigned driver: " + latestRide.getAssignedDriver();
+
+
+
+        output.writeUTF(response);
+    }
+    private static boolean disconnect(String username) {
+        for (Ride r : UberServer.rides) {
+            if (r.getCustomerUsername().equals(username)) {
+                String status = r.getStatus();
+                if (status.equals("assigned") || status.equals("in progress")) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 
 
 
