@@ -100,14 +100,29 @@ public class UberClient {
 
                 new Thread(() -> {
                     try {
-                        Scanner sc = new Scanner(System.in);
-
-                        while (true) {
-                            String msg = input.readUTF();
+                        while(true)
+                        {
+                            String msg=input.readUTF();
                             System.out.println("---------------------------------------");
                             System.out.println(msg);
                             System.out.println("---------------------------------------");
-                        }
+                            if (msg.startsWith("Offer:")) {
+                                System.out.print("Do you want to accept this offer? (yes/no): ");
+                                String answer = scanner.nextLine();
+                                if(answer.equalsIgnoreCase("yes"))
+                                {
+                                    output.writeUTF("acceptOffer");
+                                } else if (answer.equalsIgnoreCase("no")) {
+                                    output.writeUTF("declineOffer");
+                                }
+                            }
+                        
+                        System.out.println("Customer Menu:");
+                        System.out.println("1. Request a ride");
+                        System.out.println("2. View ride status");
+                        System.out.println("3. Disconnect from server.");
+                        System.out.println("Choose an option: ");
+
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
                     }
@@ -132,27 +147,7 @@ public class UberClient {
                             System.out.print("Enter Destination: ");
                             String dest = scanner.nextLine();
                             output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
-                            while(true)
-                            {
-                                String offer=input.readUTF();
-                                System.out.println(offer);
-                                if (offer.startsWith("Offer:")) {
-                                    System.out.print("Do you want to accept this offer? (yes/no): ");
-                                    String answer = scanner.nextLine();
-                                    if(answer.equalsIgnoreCase("yes"))
-                                    {
-                                        output.writeUTF("acceptOffer");
-                                    } else if (answer.equalsIgnoreCase("no")) {
-                                        output.writeUTF("declineOffer");
-                                    }
-                                }
-                                else {
-                                    System.out.println("---------------------------------------");
-                                    System.out.println(offer);
-                                    System.out.println("---------------------------------------");
-                                    break;
-                                }
-                            }
+
 
                             break;
                         case 2:
