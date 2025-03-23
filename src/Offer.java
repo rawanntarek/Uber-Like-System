@@ -1,3 +1,5 @@
+//offer
+
 public class Offer {
     String name;
     int rideId;

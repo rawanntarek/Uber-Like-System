@@ -1,3 +1,5 @@
+//Uber client info
+
 public class ClientInfo {
     private int id;
     private String role;

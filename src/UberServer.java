@@ -2,6 +2,7 @@ import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+//Uber server
 
 public class UberServer {
     public static List<ClientInfo> customers = Collections.synchronizedList(new ArrayList<>());
