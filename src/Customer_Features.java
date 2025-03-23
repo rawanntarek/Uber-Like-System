@@ -20,8 +20,14 @@ public class Customer_Features {
             } else if (message.equals("viewStatus")) {
                 viewRideStatus(username, output);
             } else if (message.equals("exit")) {
-                output.writeUTF("exit");
-                break;
+                if(disconnect(username))
+                {
+                    output.writeUTF("exit");
+                    break;
+                }
+                else {
+                    output.writeUTF("cannot disconnect your ride is on going");
+                }
             } else {
                 output.writeUTF("Unknown command.");
                 System.out.println("Unknown customer message: " + message);
@@ -156,6 +162,18 @@ public class Customer_Features {
 
         output.writeUTF(response);
     }
+    private static boolean disconnect(String username) {
+        for (Ride r : UberServer.rides) {
+            if (r.getCustomerUsername().equals(username)) {
+                String status = r.getStatus();
+                if (status.equals("assigned") || status.equals("in progress")) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 
 
 
