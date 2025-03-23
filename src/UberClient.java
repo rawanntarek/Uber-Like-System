@@ -31,7 +31,10 @@ public class UberClient {
             }
 
             String response = input.readUTF();
+            System.out.println("---------------------------------------");
             System.out.println("Server: " + response);
+            System.out.println("---------------------------------------");
+
             if (response.contains("Disconnecting")) return;
             String[] tokens = response.toLowerCase().replace(".", "").split(" ");
             String role = tokens[tokens.length - 1];
@@ -127,6 +130,24 @@ public class UberClient {
                             System.out.print("Enter Destination: ");
                             String dest = scanner.nextLine();
                             output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
+                            while(true)
+                            {
+                                String offer=input.readUTF();
+                                System.out.println(offer);
+                                if (offer.startsWith("Offer:")) {
+                                    System.out.print("Do you want to accept this offer? (yes/no): ");
+                                    String answer = scanner.nextLine();
+                                    if(answer.equalsIgnoreCase("yes"))
+                                    {
+                                        output.writeUTF("acceptOffer");
+                                    } else if (answer.equalsIgnoreCase("no")) {
+                                        output.writeUTF("declineOffer");
+                                    }
+                                }
+                                else {
+                                    break;
+                                }
+                            }
                             break;
                         case 2:
                             output.writeUTF("viewStatus");
