@@ -22,7 +22,7 @@ public class ClientHandler implements Runnable {
             output.writeUTF("Do you want to login or register?");
             String action = input.readUTF();
 
-            if (action.equalsIgnoreCase("register")) {
+            if (action.equals("register")) {
                 output.writeUTF("Enter username:");
                 username = input.readUTF();
 
@@ -32,18 +32,24 @@ public class ClientHandler implements Runnable {
                 output.writeUTF("Are you a customer or driver?");
                 role = input.readUTF().toLowerCase();
 
-                synchronized (UberServer.users) {
-                    boolean exists = UberServer.users.stream()
-                            .anyMatch(u -> u.getUsername().equals(username));
-                    if (exists) {
-                        output.writeUTF("Username already taken. Disconnecting...");
-                        return;
+
+                boolean exists = false;
+                for (User u : UberServer.users) {
+                    if (u.getUsername().equals(username)) {
+                        exists = true;
+                        break;
                     }
-                    UberServer.users.add(new User(username, password, role));
                 }
 
+                if (exists) {
+                    output.writeUTF("Username already taken. Disconnecting...");
+                    return;
+                }
+                UberServer.users.add(new User(username, password, role));
+
+
                 output.writeUTF("Registered successfully as " + role + ".");
-            } else if (action.equalsIgnoreCase("login")) {
+            } else if (action.equals("login")) {
                 output.writeUTF("Enter username:");
                 username = input.readUTF();
 
@@ -51,15 +57,15 @@ public class ClientHandler implements Runnable {
                 String password = input.readUTF();
 
                 User user = null;
-                synchronized (UberServer.users) {
-                    for (User u : UberServer.users) {
-                        if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
-                            user = u;
-                            role = u.getRole();
-                            break;
-                        }
+
+                for (User u : UberServer.users) {
+                    if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
+                        user = u;
+                        role = u.getRole();
+                        break;
                     }
                 }
+
 
                 if (user == null) {
                     output.writeUTF("Invalid username or password. Disconnecting...");

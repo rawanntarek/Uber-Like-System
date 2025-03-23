@@ -33,24 +33,24 @@ public class UberClient {
             String response = input.readUTF();
             System.out.println("Server: " + response);
             if (response.contains("Disconnecting")) return;
+            String[] tokens = response.toLowerCase().replace(".", "").split(" ");
+            String role = tokens[tokens.length - 1];
 
-            String role = "";
-            if (response.toLowerCase().contains("customer")) role = "customer";
-            else if (response.toLowerCase().contains("driver")) role = "driver";
-            else if (response.toLowerCase().contains("admin")) role = "admin";
 
             if (role.equals("driver")) {
                 new Thread(() -> {
                     try {
                         while (true) {
                             String serverMsg = input.readUTF();
-                            System.out.println( serverMsg);
+                            System.out.println("\n"+serverMsg);
 
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
                     }
                 }).start();
+                System.out.println("Listening for incoming messages...");
+
 
                 int choice = 0;
                 while (choice != 3) {
@@ -68,13 +68,11 @@ public class UberClient {
                             int fare = scanner.nextInt();
                             scanner.nextLine();
                             output.writeUTF("fare: " + fare);
-                            System.out.println("Server: " + input.readUTF());
                             break;
                         case 2:
                             System.out.print("Enter ride status (start/end): ");
                             String status = scanner.nextLine();
                             output.writeUTF(status);
-                            System.out.println("Server: " + input.readUTF());
                             break;
                         case 3:
                             output.writeUTF("exit");
@@ -91,8 +89,7 @@ public class UberClient {
                     try {
                         while (true) {
                             String msg = input.readUTF();
-                            System.out.println("\n📢 Server: " + msg);
-                            System.out.print("Choose an option: ");
+                            System.out.println("\n" + msg);
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
@@ -129,7 +126,7 @@ public class UberClient {
                     }
                 }
             }
- else if (role.equals("admin")) {
+            else if (role.equals("admin")) {
                 System.out.println("Admin menu coming soon...");
             }
 

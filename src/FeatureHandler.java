@@ -22,17 +22,20 @@ public class FeatureHandler {
                 output.writeUTF("Ride request sent. Ride ID: " + rideId);
 
                 // Broadcast to available drivers
-                synchronized (UberServer.driverOutputs) {
+
                     for (Map.Entry<String, DataOutputStream> entry : UberServer.driverOutputs.entrySet()) {
                         try {
                             DataOutputStream driverOut = entry.getValue();
                             driverOut.writeUTF("New ride request from " + username + ": Pickup at " + pickup + ", Destination: " + destination + " (Ride ID: " + rideId + ")");
                             System.out.println("Broadcasted to driver: " + entry.getKey());
+                            Thread.sleep(50);
                         } catch (IOException e) {
                             System.out.println("Failed to notify driver: " + entry.getKey());
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
                     }
-                }
+
 
             } else if (message.equals("viewStatus")) {
                 output.writeUTF("View status feature not implemented yet.");
@@ -61,15 +64,15 @@ public class FeatureHandler {
 
                 // Find the latest ride (or better, find the ride by ID in future)
                 Ride latestRide = null;
-                synchronized (UberServer.rides) {
-                    for (int i = UberServer.rides.size() - 1; i >= 0; i--) {
-                        Ride r = UberServer.rides.get(i);
-                        if (r.getStatus().equals("pending")) {
-                            latestRide = r;
-                            break;
-                        }
+
+                for (int i = UberServer.rides.size() - 1; i >= 0; i--) {
+                    Ride r = UberServer.rides.get(i);
+                    if (r.getStatus().equals("pending")) {
+                        latestRide = r;
+                        break;
                     }
                 }
+
 
                 if (latestRide == null) {
                     output.writeUTF("No available ride to offer a fare for.");
