@@ -15,7 +15,6 @@ public class UberClient {
             System.out.println(input.readUTF());
             String action = scanner.nextLine();
             output.writeUTF(action);
-
             System.out.print(input.readUTF());
             String username = scanner.nextLine();
             output.writeUTF(username);
@@ -28,6 +27,7 @@ public class UberClient {
                 System.out.print(input.readUTF());
                 String role = scanner.nextLine();
                 output.writeUTF(role);
+
             }
 
             String response = input.readUTF();
