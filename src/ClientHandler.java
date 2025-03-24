@@ -93,7 +93,8 @@ public class ClientHandler implements Runnable {
                 Driver_features.handleDriverFeatures(input, output, username, id);
 
             } else if (role.equals("admin")) {
-                //FeatureHandler.handleAdminFeatures(output);
+                System.out.println("Admin Connected");
+                Admin_features.handleAdminFeatures(input,output);
             }
 
             System.out.println("Client disconnected.");

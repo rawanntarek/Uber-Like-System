@@ -52,6 +52,7 @@ public class UberClient {
 
             }
 
+
             if (role.equals("driver")) {
                 new Thread(() -> {
                     try {
@@ -167,7 +168,31 @@ public class UberClient {
                 }
             }
             else if (role.equals("admin")) {
-                System.out.println("Admin menu coming soon...");
+                int choice=0;
+
+                while(choice!=2)
+                {
+                    System.out.println("Admin Menu:");
+                    System.out.println("1. View Statistics");
+                    System.out.println("2. Disconnect from server.");
+                    System.out.println("Choose an option: ");
+                    choice = scanner.nextInt();
+                    scanner.nextLine();
+                    switch (choice) {
+                        case 1:
+                            output.writeUTF("viewStats");
+                            while (true) {
+                                String msg = input.readUTF();
+                                if (msg.equals("end"))
+                                {break;}
+                                System.out.println(msg);
+                            }
+                            break;
+                        case 2:
+                            output.writeUTF("exit");
+                            break;
+                    }
+                }
             }
 
             scanner.close();
