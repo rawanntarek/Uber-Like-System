@@ -12,15 +12,10 @@ public class Driver_features {
                 handleFareOffer(message, username, output);
             } else if (message.equals("start") || message.equals("end")) {
                 updateRideStatus(username,message, output);
-            }else if (message.equals("exit")) {
-                if (isRideOngoingDriver(username)) {
-                    output.writeUTF("You cannot disconnect during an ongoing ride.");
-                } else {
-                    output.writeUTF("exit");
-                    break;
-                }
-            }
-            else {
+            } else if (message.equals("exit")) {
+                output.writeUTF("exit");
+                break;
+            } else {
                 output.writeUTF("Unknown command.");
                 System.out.println("Unknown driver message: " + message);
             }
@@ -101,17 +96,5 @@ public class Driver_features {
             output.writeUTF("No assigned ride found to update");
         }
     }
-    private static boolean isRideOngoingDriver(String username) {
-        for (Ride r : UberServer.rides) {
-            if (username.equals(r.getAssignedDriver())) {
-                String status = r.getStatus();
-                if (status.equalsIgnoreCase("assigned") || status.equalsIgnoreCase("in progress")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
 }

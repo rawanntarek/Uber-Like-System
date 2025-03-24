@@ -54,35 +54,29 @@ public class UberClient {
 
 
             if (role.equals("driver")) {
-
-                // Single thread for listening to server messages
                 new Thread(() -> {
                     try {
                         while (true) {
                             String serverMsg = input.readUTF();
-                            if(serverMsg.equals("exit")) {
-                                System.out.println("Disconnected from server.");
-                                socket.close();
-                                break;
-                            }
                             System.out.println("---------------------------------------");
                             System.out.println(serverMsg);
                             System.out.println("---------------------------------------");
-
                             System.out.println("Driver Menu:");
                             System.out.println("1. Offer a fare for a ride request");
                             System.out.println("2. Send status updates of the ride (start/end)");
                             System.out.println("3. Disconnect from the server.");
                             System.out.println("Choose an option: ");
+
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
                     }
                 }).start();
 
-                // Main thread ONLY writes to the server; NEVER reads directly
+
                 int choice = 0;
-                while (true) {
+                while (choice != 3) {
+
                     choice = scanner.nextInt();
                     scanner.nextLine();
 
@@ -100,15 +94,14 @@ public class UberClient {
                             break;
                         case 3:
                             output.writeUTF("exit");
-                            System.out.println("Disconnect request sent to server...");
-                            // No direct readUTF here; just wait for the listener thread to close
-                            return;  // exit main thread loop (listener will close socket)
+                            System.out.println("Disconnecting...");
+                            break;
                         default:
                             System.out.println("Invalid choice");
                     }
                 }
-            }
-            else if (role.equals("customer")) {
+
+            } else if (role.equals("customer")) {
 
                 new Thread(() -> {
                     try {
@@ -118,11 +111,6 @@ public class UberClient {
                             System.out.println("---------------------------------------");
                             System.out.println(msg);
                             System.out.println("---------------------------------------");
-                            if(msg.equals("exit")) {
-                                System.out.println("Disconnected from server.");
-                                socket.close();
-                                break;
-                            }
                             if(!msg.startsWith("Offwe:")&&!msg.startsWith("Do you want")) {
                                 System.out.println("Customer Menu:");
                                 System.out.println("1. Request a ride");
@@ -172,17 +160,7 @@ public class UberClient {
                             break;
                         case 3:
                             output.writeUTF("exit");
-
-                            // WAIT for the server response before disconnecting
-                            String serverResponse = input.readUTF();
-
-                            if (serverResponse.equals("exit")) {
-                                System.out.println("Disconnected from server.");
-                                socket.close();
-                                return;
-                            } else {
-                                System.out.println(serverResponse); // will print "You cannot disconnect during an ongoing ride."
-                            }
+                            System.out.println("Disconnecting...");
                             break;
                         default:
                             System.out.println("Invalid choice");
