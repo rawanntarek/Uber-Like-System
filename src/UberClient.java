@@ -42,7 +42,14 @@ public class UberClient {
                 System.out.println("1. Offer a fare for a ride request");
                 System.out.println("2. Send status updates of the ride (start/end)");
                 System.out.println("3. Disconnect from the server.");
-                System.out.print("Choose an option: ");
+                System.out.println("Choose an option: ");
+            } else if (role.equals("customer")) {
+                System.out.println("Customer Menu:");
+                System.out.println("1. Request a ride");
+                System.out.println("2. View ride status");
+                System.out.println("3. Disconnect from server.");
+                System.out.println("Choose an option: ");
+
             }
 
             if (role.equals("driver")) {
@@ -97,13 +104,19 @@ public class UberClient {
 
                 new Thread(() -> {
                     try {
-                        Scanner sc = new Scanner(System.in);
 
                         while (true) {
                             String msg = input.readUTF();
                             System.out.println("---------------------------------------");
                             System.out.println(msg);
                             System.out.println("---------------------------------------");
+                            if(!msg.startsWith("Offwe:")&&!msg.startsWith("Do you want")) {
+                                System.out.println("Customer Menu:");
+                                System.out.println("1. Request a ride");
+                                System.out.println("2. View ride status");
+                                System.out.println("3. Disconnect from server.");
+                                System.out.println("Choose an option: ");
+                            }
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
@@ -112,13 +125,6 @@ public class UberClient {
 
                 int choice = 0;
                 while (choice != 3) {
-
-                    System.out.println("Customer Menu:");
-                    System.out.println("1. Request a ride");
-                    System.out.println("2. View ride status");
-                    System.out.println("3. Disconnect from server.");
-                    System.out.println("Choose an option: ");
-
                     choice = scanner.nextInt();
                     scanner.nextLine();
 
