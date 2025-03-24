@@ -3,7 +3,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-//customer features
 
 public class Customer_Features {
 
@@ -15,20 +14,20 @@ public class Customer_Features {
                 handleRideRequest(message, username, output);
             } else if (message.equals("acceptOffer")) {
                 Accept_Offer(username, output);
-                
+
             } else if (message.equals("declineOffer")) {
                 declineOffer(username, output);
             } else if (message.equals("viewStatus")) {
                 viewRideStatus(username, output);
             } else if (message.equals("exit")) {
-                if(disconnect(username))
+                if(diconnect(username))
                 {
-                    output.writeUTF("exit");
-                    break;
+                    output.writeUTF("You cannot disconnect");
                 }
                 else {
-                    output.writeUTF("cannot disconnect your ride is on going");
+                    output.writeUTF("You have been disconnected");
                 }
+                break;
             } else {
                 output.writeUTF("Unknown command.");
                 System.out.println("Unknown customer message: " + message);
@@ -163,19 +162,17 @@ public class Customer_Features {
 
         output.writeUTF(response);
     }
-    private static boolean disconnect(String username) {
+
+    private static boolean diconnect(String username) {
         for (Ride r : UberServer.rides) {
             if (r.getCustomerUsername().equals(username)) {
                 String status = r.getStatus();
-                if (status.equals("assigned") || status.equals("in progress")) {
-                    return false;
+                if (status.equalsIgnoreCase("assigned") || status.equalsIgnoreCase("in progress")) {
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
-
-
-
 
 }
