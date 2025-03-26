@@ -10,6 +10,18 @@ public class Admin_features {
             if (message.equalsIgnoreCase("viewStats")) {
                 viewStatistics(output);
             }
+            else if (message.equalsIgnoreCase("storeData")) {
+                for(User user:UberServer.users)
+                {
+                    Database_features.saveCustomer(user);
+                    Database_features.saveDriver(user);
+                }
+                for(Ride ride:UberServer.rides)
+                {
+                    Database_features.saveRide(ride);
+                }
+                output.writeUTF("Data stored successfully");
+            }
 
     }
     }
