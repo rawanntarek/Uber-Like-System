@@ -19,6 +19,8 @@ public class Customer_Features {
                 declineOffer(username, output);
             } else if (message.equals("viewStatus")) {
                 viewRideStatus(username, output);
+            } else if (message.startsWith("rate:")) {
+                handleRating(message, username, output);
             } else if (message.equals("exit")) {
                 if (isRideOngoing(username)) {
                     output.writeUTF("You cannot disconnect during an ongoing ride.");
@@ -155,24 +157,62 @@ public class Customer_Features {
 
         String status = latestRide.getStatus();
         String response = "Your ride (Ride ID: " + latestRide.getRideId() + ") is currently '" + status + "',"+" Assigned driver: " + latestRide.getAssignedDriver();
-
-
+        
+        if (status.equals("completed") && !latestRide.isRated()) {
+            response += "\nYou can rate this ride using option 3 in the menu.";
+        } else if (latestRide.isRated()) {
+            response += "\nYou rated this ride: " + latestRide.getRating() + "/5";
+        }
 
         output.writeUTF(response);
     }
 
-//
-private static boolean isRideOngoing(String username) {
-    for (Ride r : UberServer.rides) {
-        if (r.getCustomerUsername().equals(username)) {
-            String status = r.getStatus();
-            if (status.equalsIgnoreCase("assigned") || status.equalsIgnoreCase("in progress")) {
-                return true;
+    private static void handleRating(String message, String username, DataOutputStream output) throws IOException {
+        Ride latestRide = null;
+        for (int i = UberServer.rides.size() - 1; i >= 0; i--) {
+            Ride r = UberServer.rides.get(i);
+            if (r.getCustomerUsername().equals(username) && r.getStatus().equals("completed") && !r.isRated()) {
+                latestRide = r;
+                break;
             }
         }
+
+        if (latestRide == null) {
+            output.writeUTF("No completed ride found to rate.");
+            return;
+        }
+
+        double rating = Double.parseDouble(message.split(":")[1].trim());
+        if (rating < 1 || rating > 5) {
+            output.writeUTF("Rating must be between 1 and 5.");
+            return;
+        }
+
+        latestRide.setRating(rating);
+        
+        // Update driver's rating
+        String driverUsername = latestRide.getAssignedDriver();
+        for (User user : UberServer.users) {
+            if (user.getUsername().equals(driverUsername)) {
+                user.addRating(rating);
+                break;
+            }
+        }
+
+        output.writeUTF("Thank you for rating your ride with " + driverUsername + "!");
     }
-    return false;
-}
+
+    private static boolean isRideOngoing(String username) {
+        for (Ride r : UberServer.rides) {
+            if (r.getCustomerUsername().equals(username)) {
+                String status = r.getStatus();
+                if (status.equalsIgnoreCase("assigned") || status.equalsIgnoreCase("in progress")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 
 }
