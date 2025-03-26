@@ -174,7 +174,8 @@ public class UberClient {
                 {
                     System.out.println("Admin Menu:");
                     System.out.println("1. View Statistics");
-                    System.out.println("2. Disconnect from server.");
+                    System.out.println("2. Store data");
+                    System.out.println("3. Disconnect from server.");
                     System.out.println("Choose an option: ");
                     choice = scanner.nextInt();
                     scanner.nextLine();
@@ -189,6 +190,9 @@ public class UberClient {
                             }
                             break;
                         case 2:
+                            output.writeUTF("storeData");
+                            break;
+                        case 3:
                             output.writeUTF("exit");
                             break;
                     }

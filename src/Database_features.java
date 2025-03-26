@@ -4,28 +4,36 @@ import org.bson.Document;
 
 
 public class Database_features {
-    private static MongoDatabase db = Database.getDatabase("Uber_App");
-    public static void saveCustomer(User user) {
+    private static MongoDatabase db = Database.getDatabase("Uber_Like_System");
+    public static void saveCustomer(ClientInfo user) {
         MongoCollection<Document> customers = db.getCollection("customers");
         if(user.getRole().equals("customer"))
         {
             Document customer=new Document("username",user.getUsername())
                     .append("password",user.getPassword())
                     .append("role",user.getRole());
-            customers.insertOne(customer);
+            try {
+                customers.insertOne(customer);
+            } catch (Exception e) {
+                System.out.println("MongoDB error: " + e.getMessage());
+            }
 
 
 
         }
     }
-    public static void saveDriver(User user) {
+    public static void saveDriver(ClientInfo user) {
         MongoCollection<Document> drivers = db.getCollection("drivers");
         if(user.getRole().equals("driver"))
         {
             Document customer=new Document("username",user.getUsername())
                     .append("password",user.getPassword())
                     .append("role",user.getRole());
-            drivers.insertOne(customer);
+            try {
+                drivers.insertOne(customer);
+            } catch (Exception e) {
+                System.out.println("MongoDB error: " + e.getMessage());
+            }
 
 
 
@@ -34,11 +42,15 @@ public class Database_features {
     public static void saveRide(Ride ride) {
         MongoCollection<Document> rides = db.getCollection("rides");
 
-            Document customer=new Document("ride id",ride.getRideId())
+            Document ridee=new Document("ride id",ride.getRideId())
                     .append("customer username",ride.getCustomerUsername())
                     .append("assigned driver",ride.getAssignedDriver())
                     .append("ride status",ride.getStatus());
-            rides.insertOne(customer);
+        try {
+            rides.insertOne(ridee);
+        } catch (Exception e) {
+            System.out.println("MongoDB error: " + e.getMessage());
+        }
 
 
 
