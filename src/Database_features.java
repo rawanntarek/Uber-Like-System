@@ -9,6 +9,11 @@ public class Database_features {
         MongoCollection<Document> customers = db.getCollection("customers");
         if(user.getRole().equals("customer"))
         {
+            Document existingCustomer=customers.find(new Document("username",user.getUsername())).first();
+            if(existingCustomer!=null)
+            {
+                return;
+            }
             Document customer=new Document("id",user.getId())
                     .append("username",user.getUsername())
                     .append("password",user.getPassword())
@@ -28,6 +33,11 @@ public class Database_features {
         MongoCollection<Document> drivers = db.getCollection("drivers");
         if(user.getRole().equals("driver"))
         {
+            Document existingDriver=drivers.find(new Document("username",user.getUsername())).first();
+            if(existingDriver!=null)
+            {
+                return;
+            }
             Document customer=new Document("id",user.getId())
                     .append("username",user.getUsername())
                     .append("password",user.getPassword())
@@ -45,7 +55,11 @@ public class Database_features {
     }
     public static void saveRide(Ride ride) {
         MongoCollection<Document> rides = db.getCollection("rides");
-
+        Document existingRide=rides.find(new Document("ride id",ride.getRideId())).first();
+        if(existingRide!=null)
+        {
+            return;
+        }
             Document ridee=new Document("ride id",ride.getRideId())
                     .append("customer username",ride.getCustomerUsername())
                     .append("assigned driver",ride.getAssignedDriver())
@@ -63,6 +77,7 @@ public class Database_features {
         }
     public static void loadCustomers() {
         MongoCollection<Document> customers = db.getCollection("customers");
+        int latest_id=0;
         for(Document customer : customers.find())
         {
             int id=customer.getInteger("id");
@@ -71,12 +86,18 @@ public class Database_features {
             String address=customer.getString("address");
             ClientInfo customerr=new ClientInfo(id,"customer",address,username,password);
             UberServer.customers.add(customerr);
+            if(id>latest_id)
+            {
+                latest_id=id;
+            }
 
 
         }
+        UberServer.customerId=latest_id+1;
     }
     public static void loadDrivers() {
         MongoCollection<Document> drivers = db.getCollection("drivers");
+        int latest_id=0;
         for(Document driver : drivers.find())
         {
             int id=driver.getInteger("id");
@@ -85,12 +106,19 @@ public class Database_features {
             String address=driver.getString("address");
             ClientInfo driverr=new ClientInfo(id,"driver",address,username,password);
             UberServer.drivers.add(driverr);
+            if(id>latest_id)
+            {
+                latest_id=id;
+            }
 
 
         }
+        UberServer.driverId=latest_id+1;
+
     }
     public static void loadRides() {
         MongoCollection<Document> rides = db.getCollection("rides");
+        int latest_id=0;
         for(Document ride : rides.find())
         {
             int id=ride.getInteger("ride id");
@@ -103,8 +131,14 @@ public class Database_features {
             ridee.setAssignedDriver(assignedDriver);
             ridee.setStatus(rideStatus);
             UberServer.rides.add(ridee);
+            if(id>latest_id)
+            {
+                latest_id=id;
+            }
 
         }
+        UberServer.rideIdCounter=latest_id+1;
+
     }
     }
 
