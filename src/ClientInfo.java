@@ -4,6 +4,8 @@ public class ClientInfo {
     private String address;
     private String username;
     private String password;
+    private double rating;
+    private int ratingCount;
 
     public ClientInfo(int id, String role, String address,String username, String password) {
         this.id = id;
@@ -11,6 +13,9 @@ public class ClientInfo {
         this.address = address;
         this.username = username;
         this.password = password;
+        this.rating = 0.0;
+        this.ratingCount = 0;
+
     }
 
     public int getId() {
@@ -31,6 +36,14 @@ public class ClientInfo {
         return password;
     }
 
+    public double getRating() {
+        return ratingCount == 0 ? 0.0 : rating / ratingCount;
+    }
+
+    public void addRating(double value) {
+        this.rating += value;
+        this.ratingCount++;
+    }
     @Override
     public String toString() {
         return role + " ID: " + id + " | Address: " + address;
