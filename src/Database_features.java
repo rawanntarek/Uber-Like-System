@@ -9,8 +9,10 @@ public class Database_features {
         MongoCollection<Document> customers = db.getCollection("customers");
         if(user.getRole().equals("customer"))
         {
-            Document customer=new Document("username",user.getUsername())
+            Document customer=new Document("id",user.getId())
+                    .append("username",user.getUsername())
                     .append("password",user.getPassword())
+                    .append("address",user.getAddress())
                     .append("role",user.getRole());
             try {
                 customers.insertOne(customer);
@@ -26,8 +28,10 @@ public class Database_features {
         MongoCollection<Document> drivers = db.getCollection("drivers");
         if(user.getRole().equals("driver"))
         {
-            Document customer=new Document("username",user.getUsername())
+            Document customer=new Document("id",user.getId())
+                    .append("username",user.getUsername())
                     .append("password",user.getPassword())
+                    .append("address",user.getAddress())
                     .append("role",user.getRole());
             try {
                 drivers.insertOne(customer);
@@ -45,6 +49,8 @@ public class Database_features {
             Document ridee=new Document("ride id",ride.getRideId())
                     .append("customer username",ride.getCustomerUsername())
                     .append("assigned driver",ride.getAssignedDriver())
+                    .append("pickup",ride.getPickup())
+                    .append("destination",ride.getDestination())
                     .append("ride status",ride.getStatus());
         try {
             rides.insertOne(ridee);
@@ -55,6 +61,51 @@ public class Database_features {
 
 
         }
+    public static void loadCustomers() {
+        MongoCollection<Document> customers = db.getCollection("customers");
+        for(Document customer : customers.find())
+        {
+            int id=customer.getInteger("id");
+            String username=customer.getString("username");
+            String password=customer.getString("password");
+            String address=customer.getString("address");
+            ClientInfo customerr=new ClientInfo(id,"customer",address,username,password);
+            UberServer.customers.add(customerr);
+
+
+        }
+    }
+    public static void loadDrivers() {
+        MongoCollection<Document> drivers = db.getCollection("drivers");
+        for(Document driver : drivers.find())
+        {
+            int id=driver.getInteger("id");
+            String username=driver.getString("username");
+            String password=driver.getString("password");
+            String address=driver.getString("address");
+            ClientInfo driverr=new ClientInfo(id,"driver",address,username,password);
+            UberServer.drivers.add(driverr);
+
+
+        }
+    }
+    public static void loadRides() {
+        MongoCollection<Document> rides = db.getCollection("rides");
+        for(Document ride : rides.find())
+        {
+            int id=ride.getInteger("ride id");
+            String CustomerUsername=ride.getString("customer username");
+            String assignedDriver=ride.getString("assigned driver");
+            String rideStatus=ride.getString("ride status");
+            String pickup=ride.getString("pickup");
+            String destination=ride.getString("destination");
+            Ride ridee=new Ride(id,CustomerUsername,pickup,destination);
+            ridee.setAssignedDriver(assignedDriver);
+            ridee.setStatus(rideStatus);
+            UberServer.rides.add(ridee);
+
+        }
+    }
     }
 
 
