@@ -170,7 +170,7 @@ public class UberClient {
             else if (role.equals("admin")) {
                 int choice=0;
 
-                while(choice!=2)
+                while(choice!=3)
                 {
                     System.out.println("Admin Menu:");
                     System.out.println("1. View Statistics");
@@ -191,6 +191,7 @@ public class UberClient {
                             break;
                         case 2:
                             output.writeUTF("storeData");
+                            System.out.println(input.readUTF());
                             break;
                         case 3:
                             output.writeUTF("exit");

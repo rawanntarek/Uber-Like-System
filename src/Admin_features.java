@@ -23,7 +23,12 @@ public class Admin_features {
                 {
                     Database_features.saveRide(ride);
                 }
-                output.writeUTF("Data stored successfully");
+                try {
+                    output.writeUTF("Data stored successfully");
+                } catch (IOException e) {
+                    System.out.println("Failed to send confirmation to client: " + e.getMessage());
+                }
+
             }
             else if (message.equalsIgnoreCase("exit")) {
                 break;

@@ -140,6 +140,7 @@ public class ClientHandler implements Runnable {
 
         } catch (IOException e) {
             System.out.println("Error in client handler: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             try {
                 if (socket != null) socket.close();
