@@ -34,13 +34,7 @@ public class UberServer {
     }
 
     public static void main(String[] args) {
-        UberServer.customers.clear();
-        UberServer.drivers.clear();
-        UberServer.rides.clear();
 
-        Database_features.loadCustomers();
-        Database_features.loadDrivers();
-        Database_features.loadRides();
         try {
             ServerSocket serverSocket = new ServerSocket(6660);
             System.out.println("Server started, and waiting for a client ...");

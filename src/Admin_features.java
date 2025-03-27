@@ -10,26 +10,6 @@ public class Admin_features {
             if (message.equalsIgnoreCase("viewStats")) {
                 viewStatistics(output);
             }
-            else if (message.equalsIgnoreCase("storeData")) {
-                for(ClientInfo customer:UberServer.customers)
-                {
-                    Database_features.saveCustomer(customer);
-                }
-                for(ClientInfo driver:UberServer.drivers)
-                {
-                    Database_features.saveDriver(driver);
-                }
-                for(Ride ride:UberServer.rides)
-                {
-                    Database_features.saveRide(ride);
-                }
-                try {
-                    output.writeUTF("Data stored successfully");
-                } catch (IOException e) {
-                    System.out.println("Failed to send confirmation to client: " + e.getMessage());
-                }
-
-            }
             else if (message.equalsIgnoreCase("exit")) {
                 break;
             }
