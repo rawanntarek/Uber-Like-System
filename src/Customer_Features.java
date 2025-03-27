@@ -188,9 +188,7 @@ public class Customer_Features {
             return;
         }
 
-        latestRide.setRating(rating);
 
-        // Update driver's rating
         String driverUsername = latestRide.getAssignedDriver();
         for (ClientInfo driver : UberServer.drivers) {
             if (driver.getUsername().equals(driverUsername)) {
@@ -198,6 +196,7 @@ public class Customer_Features {
                 break;
             }
         }
+        latestRide.setRated(true);
 
         output.writeUTF("Thank you for rating your ride with " + driverUsername + "!");
     }

@@ -37,7 +37,11 @@ public class ClientInfo {
     }
 
     public double getRating() {
-        return ratingCount == 0 ? 0.0 : rating / ratingCount;
+        if (ratingCount == 0) {
+            return 0.0;
+        } else {
+            return rating / ratingCount;
+        }
     }
 
     public void addRating(double value) {

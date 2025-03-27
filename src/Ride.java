@@ -75,4 +75,8 @@ public class Ride {
     public boolean isRated() {
         return isRated;
     }
+
+    public void setRated(boolean rated) {
+        isRated = rated;
+    }
 }
