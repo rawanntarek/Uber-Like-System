@@ -83,11 +83,14 @@ public class Driver_features {
             DataOutputStream customerOut = UberServer.customerOutputs.get(customerUsername);
             if (customerOut != null) {
                 try {
-                    double rating = 5.0; // Default rating for new drivers
-                    for(ClientInfo driver : UberServer.drivers) {
-                        if(driver.getUsername().equals(username)) {
-                            rating = driver.getRating() == 0.0 ? 5.0 : driver.getRating();
-                            break;
+                    double rating=5.0;
+                    for(ClientInfo driver:UberServer.drivers) {
+                        if (driver.getUsername().equals(username)) {
+
+                            if(driver.getRating()!=0.0) {
+                                rating = driver.getRating();
+                            }
+
                         }
                     }
                     String offerMessage = "Offer:" + username + " Rating: " + rating + " offered " + fare +
