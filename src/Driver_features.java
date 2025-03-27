@@ -14,19 +14,30 @@ public class Driver_features {
             } else if (message.equals("start") || message.equals("end")) {
                 updateRideStatus(username,message, output);
             } else if (message.equals("exit")) {
-                
-                boolean hasOngoingRide = false;
+                // Check if driver has any active ride (assigned or in progress)
+                boolean hasActiveRide = false;
                 for (Ride r : UberServer.rides) {
                     if (username.equals(r.getAssignedDriver()) && 
                         (r.getStatus().equals("in progress") || r.getStatus().equals("assigned"))) {
-                        hasOngoingRide = true;
+                        hasActiveRide = true;
                         break;
                     }
                 }
                 
-                if (hasOngoingRide) {
-                    output.writeUTF("Cannot disconnect while you have an ongoing ride. Please complete the ride first.");
+                if (hasActiveRide) {
+                    output.writeUTF("Cannot disconnect while you have an active ride. Please complete the ride first.");
                     continue;
+                }
+                
+                // Cleanup before disconnecting
+                UberServer.driverAvailability.put(username, true);
+                UberServer.driverOutputs.remove(username);
+                
+                // Remove any pending offers from this driver
+                for (Ride r : UberServer.rides) {
+                    if (r.getStatus().equals("pending")) {
+                        r.getFareOffers().remove(username);
+                    }
                 }
                 
                 output.writeUTF("exit");
