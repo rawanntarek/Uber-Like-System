@@ -7,9 +7,11 @@ public class Ride {
     private String customerUsername;
     private String pickup;
     private String destination;
-    private String status; // pending, assigned, started, completed
+    private String status;
     private String assignedDriver;
-    private Map<String, Integer> fareOffers = new HashMap<>(); // driver -> fare
+    private Map<String, Integer> fareOffers = new HashMap<>();
+    private double rating;
+    private boolean isRated;
 
     public Ride(int rideId, String customerUsername, String pickup, String destination) {
         this.rideId = rideId;
@@ -17,6 +19,8 @@ public class Ride {
         this.pickup = pickup;
         this.destination = destination;
         this.status = "pending";
+        this.rating = 0.0;
+        this.isRated = false;
     }
 
     public int getRideId() {
@@ -56,8 +60,24 @@ public class Ride {
         this.status = "assigned";
     }
 
-
     public String getAssignedDriver() {
         return assignedDriver;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+        this.isRated = true;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public boolean isRated() {
+        return isRated;
+    }
+
+    public void setRated(boolean rated) {
+        isRated = rated;
     }
 }

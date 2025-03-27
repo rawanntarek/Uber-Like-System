@@ -7,7 +7,6 @@ import java.util.*;
 public class UberServer {
     public static List<ClientInfo> customers = Collections.synchronizedList(new ArrayList<>());
     public static List<ClientInfo> drivers = Collections.synchronizedList(new ArrayList<>());
-    public static List<User> users = Collections.synchronizedList(new ArrayList<>());
     public static List<Ride> rides = Collections.synchronizedList(new ArrayList<>());
     public static Map<String, DataOutputStream> driverOutputs = Collections.synchronizedMap(new HashMap<>());
     public static Map<String, Boolean> driverAvailability = Collections.synchronizedMap(new HashMap<>());
@@ -20,20 +19,16 @@ public class UberServer {
 
     public static int customerId = 1;
     public static int driverId = 1;
-    static {
-        // Predefined admin user
-        users.add(new User("admin", "admin123", "admin"));
-    }
-    public static synchronized int addCustomer(String address, String username, DataOutputStream out) {
+    public static synchronized int addCustomer(String address, String username, String password,DataOutputStream out) {
         int id = customerId++;
-        customers.add(new ClientInfo(id, "customer", address));
+        customers.add(new ClientInfo(id, "customer", address,username,password));
         customerOutputs.put(username,out);
         return id;
     }
 
-    public static synchronized int addDriver(String address, String username, DataOutputStream out) {
+    public static synchronized int addDriver(String address, String username, String password,DataOutputStream out) {
         int id = driverId++;
-        drivers.add(new ClientInfo(id, "driver", address));
+        drivers.add(new ClientInfo(id, "driver", address,username,password));
         driverOutputs.put(username,out);
         driverAvailability.put(username,true);
 

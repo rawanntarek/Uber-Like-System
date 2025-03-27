@@ -19,6 +19,10 @@ public class ClientHandler implements Runnable {
 
             String role = "";
             String username;
+            String password;
+
+
+            String address = socket.getInetAddress().toString();
 
             output.writeUTF("Do you want to login or register?");
             String action = input.readUTF();
@@ -28,17 +32,33 @@ public class ClientHandler implements Runnable {
                 username = input.readUTF();
 
                 output.writeUTF("Enter password:");
-                String password = input.readUTF();
+                password = input.readUTF();
 
                 output.writeUTF("Are you a customer or driver?");
                 role = input.readUTF().toLowerCase();
 
 
                 boolean exists = false;
-                for (User u : UberServer.users) {
-                    if (u.getUsername().equals(username)) {
-                        exists = true;
-                        break;
+                if(role.equals("customer"))
+                {
+                    for(ClientInfo customer:UberServer.customers)
+                    {
+                        if(customer.getUsername().equals(username))
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+                else if(role.equals("driver"))
+                {
+                    for(ClientInfo driver:UberServer.drivers)
+                    {
+                        if(driver.getUsername().equals(username))
+                        {
+                            exists = true;
+                            break;
+                        }
                     }
                 }
 
@@ -46,61 +66,82 @@ public class ClientHandler implements Runnable {
                     output.writeUTF("Username already taken. Disconnecting...");
                     return;
                 }
-                UberServer.users.add(new User(username, password, role));
+                int id;
+                if (role.equals("customer")) {
+                    id=UberServer.addCustomer(address, username, password, output);
+                    System.out.println("Customer registered with ID: " + id);
+                    output.writeUTF("Registered successfully as customer.");
+                    Customer_Features.handleCustomerFeatures(input, output, username, id);
+                } else {
+                    id=UberServer.addDriver(address, username, password, output);
+                    System.out.println("Driver registered with ID: " + id);
+                    output.writeUTF("Registered successfully as driver.");
+                    Driver_features.handleDriverFeatures(input, output, username, id);
 
-
+                }
                 output.writeUTF("Registered successfully as " + role + ".");
+
             } else if (action.equals("login")) {
                 output.writeUTF("Enter username:");
                 username = input.readUTF();
 
                 output.writeUTF("Enter password:");
-                String password = input.readUTF();
+                 password = input.readUTF();
 
-                User user = null;
-
-                for (User u : UberServer.users) {
-                    if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
-                        user = u;
-                        role = u.getRole();
+                ClientInfo user=null;
+                for (ClientInfo customer : UberServer.customers) {
+                    if (customer.getUsername().equals(username) && customer.getPassword().equals(password)) {
+                        user = customer;
+                        role = "customer";
                         break;
+                    }
+                }
+                if(user==null)
+                {
+                    for (ClientInfo driver : UberServer.drivers) {
+                        if (driver.getUsername().equals(username) && driver.getPassword().equals(password)) {
+                            user = driver;
+                            role = "driver";
+                            break;
+                        }
                     }
                 }
 
 
-                if (user == null) {
+
+                if (user == null && username.equals("admin") && password.equals("admin123")) {
+                    role = "admin";
+                    username = "admin";
+                } else if (user == null) {
                     output.writeUTF("Invalid username or password. Disconnecting...");
                     return;
-                } else {
-                    output.writeUTF("Login successful as " + role + ".");
                 }
+
+                output.writeUTF("Login successful as " + role);
             } else {
-                username = "";
                 output.writeUTF("Invalid action. Disconnecting...");
                 return;
             }
 
-            String address = socket.getInetAddress().toString();
-
-            if (role.equals("customer")) {
-                int id = UberServer.addCustomer(address, username, output);
-
-                System.out.println("Customer connected with ID: " + id);
-                Customer_Features.handleCustomerFeatures(input, output, username, id);
+            if (role.equals("admin")) {
+                System.out.println("Admin Connected");
+                Admin_features.handleAdminFeatures(input,output);
+            }
+            else if (role.equals("customer")) {
+                System.out.println("Customer Logged in");
+                Customer_Features.handleCustomerFeatures(input, output, username, -1);
 
             } else if (role.equals("driver")) {
-                int id = UberServer.addDriver(address, username, output);
-                System.out.println("Driver connected with ID: " + id);
-                Driver_features.handleDriverFeatures(input, output, username, id);
+                System.out.println("driver Logged in");
+                Driver_features.handleDriverFeatures(input, output, username, -1);
 
-            } else if (role.equals("admin")) {
-                //FeatureHandler.handleAdminFeatures(output);
             }
 
             System.out.println("Client disconnected.");
 
         } catch (IOException e) {
             System.out.println("Error in client handler: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             try {
                 if (socket != null) socket.close();

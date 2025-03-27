@@ -15,7 +15,6 @@ public class UberClient {
             System.out.println(input.readUTF());
             String action = scanner.nextLine();
             output.writeUTF(action);
-
             System.out.print(input.readUTF());
             String username = scanner.nextLine();
             output.writeUTF(username);
@@ -28,83 +27,60 @@ public class UberClient {
                 System.out.print(input.readUTF());
                 String role = scanner.nextLine();
                 output.writeUTF(role);
+
             }
 
             String response = input.readUTF();
             System.out.println("Server: " + response);
             if (response.contains("Disconnecting")) return;
-
             String[] tokens = response.toLowerCase().replace(".", "").split(" ");
             String role = tokens[tokens.length - 1];
 
-            // Separate Thread to Listen for Server Messages
-            new Thread(() -> {
-                try {
-                    while (true) {
-                        String serverMsg = input.readUTF();
-                        System.out.println("\n---------------------------------------");
-                        System.out.println(serverMsg);
-                        System.out.println("---------------------------------------");
-                        System.out.print("\nChoose an option: ");
-                    }
-                } catch (IOException e) {
-                    System.out.println("\nConnection Closed.");
-                }
-            }).start();
+            if(role.equals("driver"))
+            {
+                System.out.println("Driver Menu:");
+                System.out.println("1. Offer a fare for a ride request");
+                System.out.println("2. Send status updates of the ride (start/end)");
+                System.out.println("3. Disconnect from the server.");
+                System.out.print("Choose an option: ");
+            } else if (role.equals("customer")) {
+                System.out.println("\nCustomer Menu:");
+                System.out.println("1. Request a ride");
+                System.out.println("2. View ride status");
+                System.out.println("3. Rate your last ride");
+                System.out.println("4. Disconnect from server.");
+                System.out.print("Choose an option: ");
+            }
 
-            // Main Thread Handles User Input
-            if (role.equals("customer")) {
-                int choice = 0;
-                while (choice != 3) {
-                    System.out.println("\nCustomer Menu:");
-                    System.out.println("1. Request a ride");
-                    System.out.println("2. View ride status");
-                    System.out.println("3. Disconnect from server.");
-                    System.out.print("Choose an option: ");
+            if (role.equals("driver")) {
 
-                    choice = scanner.nextInt();
-                    scanner.nextLine();
-
-                    switch (choice) {
-                        case 1:
-                            System.out.print("Enter Pickup Location: ");
-                            String pickup = scanner.nextLine();
-                            System.out.print("Enter Destination: ");
-                            String dest = scanner.nextLine();
-                            output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
-
-                            while (true) {
-                                String answer = scanner.nextLine();
-                                output.writeUTF(answer);
-                                if (answer.equalsIgnoreCase("acceptOffer")) {
-                                    break; // break after accepting offer
-                                }
+                // Single thread for listening to server messages
+                new Thread(() -> {
+                    try {
+                        while (true) {
+                            String serverMsg = input.readUTF();
+                            if(serverMsg.equals("exit")) {
+                                System.out.println("Disconnected from server.");
+                                socket.close();
+                                break;
                             }
-                            break;
+                            System.out.println("---------------------------------------");
+                            System.out.println(serverMsg);
+                            System.out.println("---------------------------------------");
 
-                        case 2:
-                            output.writeUTF("viewStatus");
-                            break;
-
-                        case 3:
-                            output.writeUTF("exit");
-                            System.out.println("Disconnecting...");
-                            socket.close();
-                            return;
-
-                        default:
-                            System.out.println("Invalid choice.");
+                            System.out.println("Driver Menu:");
+                            System.out.println("1. Offer a fare for a ride request");
+                            System.out.println("2. Send status updates of the ride (start/end)");
+                            System.out.println("3. Disconnect from the server.");
+                            System.out.println("Choose an option: ");
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Disconnected from server.");
                     }
-                }
-            } else if (role.equals("driver")) {
-                int choice = 0;
-                while (choice != 3) {
-                    System.out.println("\nDriver Menu:");
-                    System.out.println("1. Offer a fare for a ride request");
-                    System.out.println("2. Send status updates of the ride (start/end)");
-                    System.out.println("3. Disconnect from the server.");
-                    System.out.print("Choose an option: ");
+                }).start();
 
+               int choice = 0;
+                while (true) {
                     choice = scanner.nextInt();
                     scanner.nextLine();
 
@@ -115,24 +91,108 @@ public class UberClient {
                             scanner.nextLine();
                             output.writeUTF("fare: " + fare);
                             break;
-
                         case 2:
                             System.out.print("Enter ride status (start/end): ");
                             String status = scanner.nextLine();
                             output.writeUTF(status);
                             break;
-
                         case 3:
                             output.writeUTF("exit");
-                            System.out.println("Disconnecting...");
-                            socket.close();
+                            System.out.println("Disconnect request sent to server...");
                             return;
-
                         default:
-                            System.out.println("Invalid choice.");
+                            System.out.println("Invalid choice");
                     }
                 }
-            } else if (role.equals("admin")) {
+            }
+            else if (role.equals("customer")) {
+                new Thread(() -> {
+                    try {
+                        while (true) {
+                            String msg = input.readUTF();
+                            System.out.println("---------------------------------------");
+                            System.out.println(msg);
+                            System.out.println("---------------------------------------");
+                            if(msg.equals("exit")) {
+                                System.out.println("Disconnected from server.");
+                                socket.close();
+                                break;
+                            }
+                            if(!msg.startsWith("Offer:")&&!msg.startsWith("Do you want")) {
+                                System.out.println("Customer Menu:");
+                                System.out.println("1. Request a ride");
+                                System.out.println("2. View ride status");
+                                System.out.println("3. Rate your last ride");
+                                System.out.println("4. Disconnect from server.");
+                                System.out.println("Choose an option: ");
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Disconnected from server.");
+                    }
+                }).start();
+
+                int choice = 0;
+                while (choice != 4) {
+                    choice = scanner.nextInt();
+                    scanner.nextLine();
+
+                    switch (choice) {
+                        case 1:
+                            System.out.print("Enter Pickup Location: ");
+                            String pickup = scanner.nextLine();
+                            System.out.print("Enter Destination: ");
+                            String dest = scanner.nextLine();
+                            output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
+                            while(true)
+                            {
+                                String offer=input.readUTF();
+                                System.out.println(offer);
+                                if (offer.startsWith("Offer:")) {
+                                    System.out.print("Do you want to accept this offer? (yes/no): ");
+                                    String answer = scanner.nextLine();
+                                    if(answer.equalsIgnoreCase("yes"))
+                                    {
+                                        output.writeUTF("acceptOffer");
+                                    } else if (answer.equalsIgnoreCase("no")) {
+                                        output.writeUTF("declineOffer");
+                                    }
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            break;
+                        case 2:
+                            output.writeUTF("viewStatus");
+                            break;
+                        case 3:
+                            System.out.print("Enter rating (1-5): ");
+                            double rating = scanner.nextDouble();
+                            scanner.nextLine();
+                            if (rating >= 1 && rating <= 5) {
+                                output.writeUTF("rate:" + rating);
+                            } else {
+                                System.out.println("Rating must be between 1 and 5");
+                            }
+                            break;
+                        case 4:
+                            output.writeUTF("exit");
+                            String serverResponse = input.readUTF();
+                            if (serverResponse.equals("exit")) {
+                                System.out.println("Disconnected from server.");
+                                socket.close();
+                                return;
+                            } else {
+                                System.out.println(serverResponse);
+                            }
+                            break;
+                        default:
+                            System.out.println("Invalid choice");
+                    }
+                }
+            }
+            else if (role.equals("admin")) {
                 System.out.println("Admin menu coming soon...");
             }
 
