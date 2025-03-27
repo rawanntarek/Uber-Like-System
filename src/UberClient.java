@@ -67,47 +67,62 @@ public class UberClient {
                             System.out.println(serverMsg);
                             System.out.println("---------------------------------------");
 
-                            System.out.println("Driver Menu:");
-                            System.out.println("1. Offer a fare for a ride request");
-                            System.out.println("2. Send status updates of the ride (start/end)");
-                            System.out.println("3. Disconnect from the server.");
-                            System.out.println("Choose an option: ");
+                            // Only reprint menu if we're not in the middle of a fare offer process
+                            if (!serverMsg.startsWith("Available pending rides:") && !serverMsg.startsWith("Enter the number")) {
+                                System.out.println("Driver Menu:");
+                                System.out.println("1. Offer a fare for a ride request");
+                                System.out.println("2. Send status updates of the ride (start/end)");
+                                System.out.println("3. Disconnect from the server.");
+                                System.out.print("Choose an option: ");
+                            }
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
                     }
                 }).start();
 
-               int choice = 0;
+                int choice = 0;
                 while (true) {
-                    choice = scanner.nextInt();
-                    scanner.nextLine();
+                    try {
+                        choice = scanner.nextInt();
+                        scanner.nextLine();
 
-                    switch (choice) {
-                        case 1:
-                            System.out.print("Offer a fare: ");
-                            int fare = scanner.nextInt();
-                            scanner.nextLine();
-                            output.writeUTF("fare: " + fare);
-                            break;
-                        case 2:
-                            System.out.print("Enter ride status (start/end): ");
-                            String status = scanner.nextLine();
-                            output.writeUTF(status);
-                            break;
-                        case 3:
-                            output.writeUTF("exit");
-                            String serverResponse = input.readUTF();
-                            if (serverResponse.equals("exit")) {
-                                System.out.println("Disconnected from server.");
-                                socket.close();
-                                return;
-                            } else {
-                                System.out.println(serverResponse);
-                            }
-                            break;
-                        default:
-                            System.out.println("Invalid choice");
+                        switch (choice) {
+                            case 1:
+                                output.writeUTF("fare: 0"); // Initial request to get list of rides
+                                
+                                // Wait for user input without menu interference
+                                System.out.print("Enter the number of the ride you want to offer a fare for: ");
+                                int rideChoice = scanner.nextInt();
+                                scanner.nextLine();
+                                
+                                System.out.print("Enter the fare amount: ");
+                                int fare = scanner.nextInt();
+                                scanner.nextLine();
+                                
+                                output.writeUTF("fare: " + rideChoice + " " + fare);
+                                break;
+                            case 2:
+                                System.out.print("Enter ride status (start/end): ");
+                                String status = scanner.nextLine();
+                                output.writeUTF(status);
+                                break;
+                            case 3:
+                                output.writeUTF("exit");
+                                String serverResponse = input.readUTF();
+                                if (serverResponse.equals("exit")) {
+                                    System.out.println("Disconnected from server.");
+                                    socket.close();
+                                    return;
+                                } else {
+                                    System.out.println(serverResponse);
+                                }
+                                break;
+                            default:
+                                System.out.println("Invalid choice");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error: " + e.getMessage());
                     }
                 }
             }

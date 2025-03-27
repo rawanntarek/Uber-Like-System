@@ -1,6 +1,9 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 //driver features
 
 public class Driver_features {
@@ -54,47 +57,76 @@ public class Driver_features {
             return;
         }
 
-        Ride latestRide = null;
-        for (int i = UberServer.rides.size() - 1; i >= 0; i--) {
-            Ride r = UberServer.rides.get(i);
+        // Get all pending rides
+        List<Ride> pendingRides = new ArrayList<>();
+        for (Ride r : UberServer.rides) {
             if (r.getStatus().equals("pending")) {
-                latestRide = r;
-                break;
+                pendingRides.add(r);
             }
         }
 
-        if (latestRide == null) {
-            output.writeUTF("No available ride to offer a fare for.");
+        if (pendingRides.isEmpty()) {
+            output.writeUTF("No available rides to offer a fare for.");
             return;
         }
 
+        // If this is the initial request (message contains only "fare: 0")
+        if (message.equals("fare: 0")) {
+            // Send list of pending rides to driver
+            StringBuilder ridesList = new StringBuilder();
+            ridesList.append("Available pending rides:\n");
+            for (int i = 0; i < pendingRides.size(); i++) {
+                Ride r = pendingRides.get(i);
+                ridesList.append(i + 1).append(". Ride ID: ").append(r.getRideId())
+                        .append(" - From: ").append(r.getPickup())
+                        .append(" To: ").append(r.getDestination())
+                        .append("\n");
+            }
+            ridesList.append("Enter the number of the ride you want to offer a fare for: ");
+            output.writeUTF(ridesList.toString());
+            return;
+        }
+
+        // Handle the fare offer with ride selection
         try {
-            int fare = Integer.parseInt(message.split(":")[1].trim());
-            latestRide.addFareOffer(username, fare);
+            String[] parts = message.split(" ");
+            if (parts.length != 3) {
+                output.writeUTF("Invalid message format. Please try again.");
+                return;
+            }
+
+            int rideIndex = Integer.parseInt(parts[1]) - 1;
+            int fare = Integer.parseInt(parts[2]);
+
+            if (rideIndex < 0 || rideIndex >= pendingRides.size()) {
+                output.writeUTF("Invalid ride selection.");
+                return;
+            }
+
+            Ride selectedRide = pendingRides.get(rideIndex);
+            selectedRide.addFareOffer(username, fare);
             UberServer.driverAvailability.put(username, false);
 
-            output.writeUTF("Offer:" + fare + " sent for ride ID: " + latestRide.getRideId());
-            Offer offer = new Offer(username, latestRide.getRideId(), fare);
-            String customerUsername = latestRide.getCustomerUsername();
+            output.writeUTF("Offer:" + fare + " sent for ride ID: " + selectedRide.getRideId());
+            Offer offer = new Offer(username, selectedRide.getRideId(), fare);
+            String customerUsername = selectedRide.getCustomerUsername();
             UberServer.pendingCustomerOffers.put(customerUsername, offer);
             
-            System.out.println("Offer:" + username + " offered fare " + fare + " for Ride " + latestRide.getRideId());
+            System.out.println("Offer:" + username + " offered fare " + fare + " for Ride " + selectedRide.getRideId());
 
             DataOutputStream customerOut = UberServer.customerOutputs.get(customerUsername);
             if (customerOut != null) {
                 try {
-                    double rating=5.0;
-                    for(ClientInfo driver:UberServer.drivers) {
+                    double rating = 5.0;
+                    for(ClientInfo driver : UberServer.drivers) {
                         if (driver.getUsername().equals(username)) {
-
-                            if(driver.getRating()!=0.0) {
+                            if(driver.getRating() != 0.0) {
                                 rating = driver.getRating();
                             }
-
                         }
                     }
                     String offerMessage = "Offer:" + username + " Rating: " + rating + " offered " + fare +
-                            " for your ride (Ride ID: " + latestRide.getRideId() + ")";
+                            " for your ride (Ride ID: " + selectedRide.getRideId() + ")";
                     customerOut.writeUTF(offerMessage);
                     System.out.println("Sent offer to customer: " + customerUsername);
                 } catch (IOException e) {
@@ -104,7 +136,7 @@ public class Driver_features {
                 System.out.println("Customer connection not found: " + customerUsername);
             }
         } catch (NumberFormatException e) {
-            output.writeUTF("Invalid fare amount. Please enter a valid number.");
+            output.writeUTF("Invalid input. Please enter valid numbers for ride selection and fare amount.");
         }
     }
     private static void updateRideStatus(String driverUsername, String status, DataOutputStream output) throws IOException {
