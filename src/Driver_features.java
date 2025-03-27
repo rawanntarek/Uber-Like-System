@@ -14,6 +14,21 @@ public class Driver_features {
             } else if (message.equals("start") || message.equals("end")) {
                 updateRideStatus(username,message, output);
             } else if (message.equals("exit")) {
+                
+                boolean hasOngoingRide = false;
+                for (Ride r : UberServer.rides) {
+                    if (username.equals(r.getAssignedDriver()) && 
+                        (r.getStatus().equals("in progress") || r.getStatus().equals("assigned"))) {
+                        hasOngoingRide = true;
+                        break;
+                    }
+                }
+                
+                if (hasOngoingRide) {
+                    output.writeUTF("Cannot disconnect while you have an ongoing ride. Please complete the ride first.");
+                    continue;
+                }
+                
                 output.writeUTF("exit");
                 break;
             } else {
