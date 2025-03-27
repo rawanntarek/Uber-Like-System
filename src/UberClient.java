@@ -98,8 +98,15 @@ public class UberClient {
                             break;
                         case 3:
                             output.writeUTF("exit");
-                            System.out.println("Disconnect request sent to server...");
-                            return;
+                            String serverResponse = input.readUTF();
+                            if (serverResponse.equals("exit")) {
+                                System.out.println("Disconnected from server.");
+                                socket.close();
+                                return;
+                            } else {
+                                System.out.println(serverResponse);
+                            }
+                            break;
                         default:
                             System.out.println("Invalid choice");
                     }
