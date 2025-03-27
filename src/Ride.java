@@ -6,11 +6,11 @@ public class Ride {
     private String customerUsername;
     private String pickup;
     private String destination;
-    private String status; // pending, assigned, started, completed
+    private String status;
     private String assignedDriver;
-    private Map<String, Integer> fareOffers = new HashMap<>(); // driver -> fare
-    private double rating; // rating given by customer
-    private boolean isRated; // flag to track if ride has been rated
+    private Map<String, Integer> fareOffers = new HashMap<>();
+    private double rating;
+    private boolean isRated;
 
     public Ride(int rideId, String customerUsername, String pickup, String destination) {
         this.rideId = rideId;
