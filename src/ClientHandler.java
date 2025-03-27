@@ -117,6 +117,15 @@ public class ClientHandler implements Runnable {
                     return;
                 }
 
+                // Update customer's connection if they're logging in
+                if (role.equals("customer")) {
+                    // Clear any old pending offers for this customer
+                    UberServer.pendingCustomerOffers.remove(username);
+                    // Update the customer's connection
+                    UberServer.customerOutputs.put(username, output);
+                    System.out.println("Updated customer connection for: " + username);
+                }
+
                 output.writeUTF("Login successful as " + role);
             } else {
                 output.writeUTF("Invalid action. Disconnecting...");

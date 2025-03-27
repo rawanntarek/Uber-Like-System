@@ -14,7 +14,7 @@ public class Driver_features {
             } else if (message.equals("start") || message.equals("end")) {
                 updateRideStatus(username,message, output);
             } else if (message.equals("exit")) {
-                // Check if driver has any active ride (assigned or in progress)
+              
                 boolean hasActiveRide = false;
                 for (Ride r : UberServer.rides) {
                     if (username.equals(r.getAssignedDriver()) && 
@@ -29,11 +29,10 @@ public class Driver_features {
                     continue;
                 }
                 
-                // Cleanup before disconnecting
+                
                 UberServer.driverAvailability.put(username, true);
                 UberServer.driverOutputs.remove(username);
                 
-                // Remove any pending offers from this driver
                 for (Ride r : UberServer.rides) {
                     if (r.getStatus().equals("pending")) {
                         r.getFareOffers().remove(username);
@@ -66,8 +65,10 @@ public class Driver_features {
 
         if (latestRide == null) {
             output.writeUTF("No available ride to offer a fare for.");
+            return;
+        }
 
-        } else {
+        try {
             int fare = Integer.parseInt(message.split(":")[1].trim());
             latestRide.addFareOffer(username, fare);
             UberServer.driverAvailability.put(username, false);
@@ -76,34 +77,31 @@ public class Driver_features {
             Offer offer = new Offer(username, latestRide.getRideId(), fare);
             String customerUsername = latestRide.getCustomerUsername();
             UberServer.pendingCustomerOffers.put(customerUsername, offer);
-            // 3shan a save  el offer
+            
             System.out.println("Offer:" + username + " offered fare " + fare + " for Ride " + latestRide.getRideId());
 
-             customerUsername = latestRide.getCustomerUsername();
             DataOutputStream customerOut = UberServer.customerOutputs.get(customerUsername);
             if (customerOut != null) {
                 try {
-                    double rating=0.0;
-                    for(ClientInfo driver:UberServer.drivers)
-                    {
-                        if(driver.getUsername().equals(username))
-                        {
-                            if(driver.getRating()==0.0)
-                            {
-                                rating=5.0;
-                            }
-                            else {
-                                rating = driver.getRating();
-                            }
+                    double rating = 5.0; // Default rating for new drivers
+                    for(ClientInfo driver : UberServer.drivers) {
+                        if(driver.getUsername().equals(username)) {
+                            rating = driver.getRating() == 0.0 ? 5.0 : driver.getRating();
                             break;
                         }
                     }
-                    customerOut.writeUTF("Offer:" + username +" Rating: "+rating +" offered " + fare +
-                            " for your ride (Ride ID: " + latestRide.getRideId() + ")");
+                    String offerMessage = "Offer:" + username + " Rating: " + rating + " offered " + fare +
+                            " for your ride (Ride ID: " + latestRide.getRideId() + ")";
+                    customerOut.writeUTF(offerMessage);
+                    System.out.println("Sent offer to customer: " + customerUsername);
                 } catch (IOException e) {
-                    System.out.println("Failed to notify customer: " + customerUsername);
+                    System.out.println("Failed to notify customer: " + customerUsername + " - " + e.getMessage());
                 }
+            } else {
+                System.out.println("Customer connection not found: " + customerUsername);
             }
+        } catch (NumberFormatException e) {
+            output.writeUTF("Invalid fare amount. Please enter a valid number.");
         }
     }
     private static void updateRideStatus(String driverUsername, String status, DataOutputStream output) throws IOException {
