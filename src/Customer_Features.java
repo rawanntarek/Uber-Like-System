@@ -182,25 +182,30 @@ public class Customer_Features {
             return;
         }
 
-        double rating = Double.parseDouble(message.split(":")[1].trim());
-        if (rating < 1 || rating > 5) {
-            output.writeUTF("Rating must be between 1 and 5.");
-            return;
-        }
+        String[] parts = message.split(":")[1].trim().split(",");
+        double rating = Double.parseDouble(parts[0]);
+        double drivingSkill = Double.parseDouble(parts[1]);
+        double goodmusic = Double.parseDouble(parts[2]);
+        double friendliness = Double.parseDouble(parts[3]);
 
 
         String driverUsername = latestRide.getAssignedDriver();
         for (ClientInfo driver : UberServer.drivers) {
             if (driver.getUsername().equals(driverUsername)) {
-                driver.addRating(rating);
+                driver.addRating(rating,drivingSkill,friendliness,goodmusic);
                 break;
             }
         }
         latestRide.setRated(true);
 
         output.writeUTF("Thank you for rating your ride with " + driverUsername + "!");
-    }
 
+        DataOutputStream driverOut=UberServer.driverOutputs.get(driverUsername);
+        if(driverOut!=null)
+        {
+            driverOut.writeUTF("Customer: "+username+" rated you, rating: "+rating+" driving skill: "+drivingSkill+" friendliness: "+friendliness+" goodmusic: "+goodmusic);
+        }
+    }
     private static boolean isRideOngoing(String username) {
         for (Ride r : UberServer.rides) {
             if (r.getCustomerUsername().equals(username)) {
@@ -212,6 +217,7 @@ public class Customer_Features {
         }
         return false;
     }
+
 
 
 }
