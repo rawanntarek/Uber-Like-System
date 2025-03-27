@@ -167,14 +167,25 @@ public class UberClient {
                             output.writeUTF("viewStatus");
                             break;
                         case 3:
-                            System.out.print("Enter rating (1-5): ");
-                            double rating = scanner.nextDouble();
+                            System.out.print("Enter overall rating (1-5): ");
+                            double overall = scanner.nextDouble();
+                            System.out.print("Enter driving skill rating (1-5): ");
+                            double drivingSkill = scanner.nextDouble();
+                            System.out.print("Enter good music rating (1-5): ");
+                            double music = scanner.nextDouble();
+                            System.out.print("Enter friendliness rating (1-5): ");
+                            double friendliness = scanner.nextDouble();
                             scanner.nextLine();
-                            if (rating >= 1 && rating <= 5) {
-                                output.writeUTF("rate:" + rating);
+
+                            if (overall >= 1 && overall <= 5 &&
+                                    drivingSkill >= 1 && drivingSkill <= 5 &&
+                                    music >= 1 && music <= 5 &&
+                                    friendliness >= 1 && friendliness <= 5) {
+                                output.writeUTF("rate:" + overall + "," + drivingSkill + "," + music + "," + friendliness);
                             } else {
-                                System.out.println("Rating must be between 1 and 5");
+                                System.out.println("rating must be between 1 and 5.");
                             }
+
                             break;
                         case 4:
                             output.writeUTF("exit");
@@ -193,7 +204,31 @@ public class UberClient {
                 }
             }
             else if (role.equals("admin")) {
-                System.out.println("Admin menu coming soon...");
+                int choice = 0;
+
+                while (choice != 2) {
+                    System.out.println("Admin Menu:");
+                    System.out.println("1. View Statistics");
+                    System.out.println("2. Disconnect from server.");
+                    System.out.println("Choose an option: ");
+                    choice = scanner.nextInt();
+                    scanner.nextLine();
+                    switch (choice) {
+                        case 1:
+                            output.writeUTF("viewStats");
+                            while (true) {
+                                String msg = input.readUTF();
+                                if (msg.equals("end")) {
+                                    break;
+                                }
+                                System.out.println(msg);
+                            }
+                            break;
+                        case 2:
+                            output.writeUTF("exit");
+                            break;
+                    }
+                }
             }
 
             scanner.close();

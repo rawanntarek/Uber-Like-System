@@ -5,6 +5,9 @@ public class ClientInfo {
     private String username;
     private String password;
     private double rating;
+    private double drivingSkills;
+    private double goodMusic;
+    private double friendliness;
     private int ratingCount;
 
     public ClientInfo(int id, String role, String address,String username, String password) {
@@ -40,13 +43,16 @@ public class ClientInfo {
         if (ratingCount == 0) {
             return 0.0;
         } else {
-            return rating / ratingCount;
+            return (rating+friendliness+goodMusic+drivingSkills) / (4*ratingCount);
         }
     }
 
-    public void addRating(double value) {
-        this.rating += value;
+    public void addRating(double rating,double drivingSkills,double friendliness,double goodMusic) {
+        this.rating += rating;
         this.ratingCount++;
+        this.drivingSkills += drivingSkills;
+        this.friendliness += friendliness;
+        this.goodMusic += goodMusic;
     }
     @Override
     public String toString() {

@@ -55,7 +55,22 @@ public class Driver_features {
             DataOutputStream customerOut = UberServer.customerOutputs.get(customerUsername);
             if (customerOut != null) {
                 try {
-                    customerOut.writeUTF("Offer:" + username + " offered " + fare +
+                    double rating=0.0;
+                    for(ClientInfo driver:UberServer.drivers)
+                    {
+                        if(driver.getUsername().equals(username))
+                        {
+                            if(driver.getRating()==0.0)
+                            {
+                                rating=5.0;
+                            }
+                            else {
+                                rating = driver.getRating();
+                            }
+                            break;
+                        }
+                    }
+                    customerOut.writeUTF("Offer:" + username +" Rating: "+rating +" offered " + fare +
                             " for your ride (Ride ID: " + latestRide.getRideId() + ")");
                 } catch (IOException e) {
                     System.out.println("Failed to notify customer: " + customerUsername);
@@ -83,7 +98,7 @@ public class Driver_features {
                     r.setStatus("completed");
                     output.writeUTF("Ride completed for Ride ID: " + r.getRideId());
                     DataOutputStream customerOut = UberServer.customerOutputs.get(r.getCustomerUsername());
-                    customerOut.writeUTF("Your ride completed with "+driverUsername);
+                    customerOut.writeUTF("Your can rate your driver from option 3 ");
                     UberServer.driverAvailability.put(driverUsername, true);
                 }
 
