@@ -104,36 +104,37 @@ public class Driver_features {
             }
 
             Ride selectedRide = pendingRides.get(rideIndex);
+            String customerUsername = selectedRide.getCustomerUsername();
+
             selectedRide.addFareOffer(username, fare);
             UberServer.driverAvailability.put(username, false);
 
             output.writeUTF("Offer:" + fare + " sent for ride ID: " + selectedRide.getRideId());
-            Offer offer = new Offer(username, selectedRide.getRideId(), fare);
-            String customerUsername = selectedRide.getCustomerUsername();
-            UberServer.pendingCustomerOffers.put(customerUsername, offer);
-            
             System.out.println("Offer:" + username + " offered fare " + fare + " for Ride " + selectedRide.getRideId());
-
-            DataOutputStream customerOut = UberServer.customerOutputs.get(customerUsername);
-            if (customerOut != null) {
-                try {
-                    double rating = 5.0;
-                    for(ClientInfo driver : UberServer.drivers) {
-                        if (driver.getUsername().equals(username)) {
-                            if(driver.getRating() != 0.0) {
-                                rating = driver.getRating();
+            if (!UberServer.pendingCustomerOffers.containsKey(customerUsername)) {
+                Offer offer = new Offer(username, selectedRide.getRideId(), fare);
+                UberServer.pendingCustomerOffers.put(customerUsername, offer);
+                DataOutputStream customerOut = UberServer.customerOutputs.get(customerUsername);
+                if (customerOut != null) {
+                    try {
+                        double rating = 5.0;
+                        for (ClientInfo driver : UberServer.drivers) {
+                            if (driver.getUsername().equals(username)) {
+                                if (driver.getRating() != 0.0) {
+                                    rating = driver.getRating();
+                                }
                             }
                         }
+                        String offerMessage = "Offer:" + username + " Rating: " + rating + " offered " + fare +
+                                " for your ride (Ride ID: " + selectedRide.getRideId() + ")";
+                        customerOut.writeUTF(offerMessage);
+                        System.out.println("Sent offer to customer: " + customerUsername);
+                    } catch (IOException e) {
+                        System.out.println("Failed to notify customer: " + customerUsername + " - " + e.getMessage());
                     }
-                    String offerMessage = "Offer:" + username + " Rating: " + rating + " offered " + fare +
-                            " for your ride (Ride ID: " + selectedRide.getRideId() + ")";
-                    customerOut.writeUTF(offerMessage);
-                    System.out.println("Sent offer to customer: " + customerUsername);
-                } catch (IOException e) {
-                    System.out.println("Failed to notify customer: " + customerUsername + " - " + e.getMessage());
+                } else {
+                    System.out.println("Customer connection not found: " + customerUsername);
                 }
-            } else {
-                System.out.println("Customer connection not found: " + customerUsername);
             }
         } catch (NumberFormatException e) {
             output.writeUTF("Invalid input. Please enter valid numbers for ride selection and fare amount.");
