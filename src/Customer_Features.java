@@ -96,12 +96,13 @@ public class Customer_Features {
     }
     public static void declineOffer(String username, DataOutputStream output) throws IOException {
         Offer declined = UberServer.pendingCustomerOffers.remove(username);
-        UberServer.driverAvailability.put(declined.getName(), true);
-
         if (declined == null) {
-            output.writeUTF("No offer to decline.");
             return;
         }
+
+        UberServer.driverAvailability.put(declined.getName(), true);
+
+
 
         Ride ride = null;
         for (Ride r : UberServer.rides) {
@@ -119,11 +120,14 @@ public class Customer_Features {
         }
 
         ride.getFareOffers().remove(declined.getName());
+        ride.addDeclinedDriver(declined.getName());
 
         String nextDriver = null;
         for (String driver : ride.getFareOffers().keySet()) {
-            nextDriver = driver;
-            break;
+            if(!ride.getDeclinedDrivers().contains(driver)) {
+                nextDriver = driver;
+                break;
+            }
         }
 
         if (nextDriver != null) {

@@ -1,5 +1,7 @@
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 //ride
 
 public class Ride {
@@ -12,6 +14,8 @@ public class Ride {
     private Map<String, Integer> fareOffers = new HashMap<>();
     private double rating;
     private boolean isRated;
+    Set<String> declinedDrivers = new HashSet<>();
+
 
     public Ride(int rideId, String customerUsername, String pickup, String destination) {
         this.rideId = rideId;
@@ -80,4 +84,11 @@ public class Ride {
     public void setRated(boolean rated) {
         isRated = rated;
     }
+    public void addDeclinedDriver(String driver) {
+        declinedDrivers.add(driver);
+    }
+    public Set<String> getDeclinedDrivers() {
+        return declinedDrivers;
+    }
+
 }

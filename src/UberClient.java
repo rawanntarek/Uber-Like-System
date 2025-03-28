@@ -114,18 +114,18 @@ public class UberClient {
                                 output.writeUTF("fare: 0"); // Initial request to get list of rides
                                 
                                 // Wait for user input without menu interference
-                                System.out.print("Enter the number of the ride you want to offer a fare for: ");
+                                System.out.println("Enter the number of the ride you want to offer a fare for: ");
                                 int rideChoice = scanner.nextInt();
                                 scanner.nextLine();
                                 
-                                System.out.print("Enter the fare amount: ");
+                                System.out.println("Enter the fare amount: ");
                                 int fare = scanner.nextInt();
                                 scanner.nextLine();
                                 
                                 output.writeUTF("fare: " + rideChoice + " " + fare);
                                 break;
                             case 2:
-                                System.out.print("Enter ride status (start/end): ");
+                                System.out.println("Enter ride status (start/end): ");
                                 String status ="";
                                 while(true)
                                 {
@@ -208,7 +208,7 @@ public class UberClient {
                                     String offer = input.readUTF();
                                     System.out.println(offer);
                                     if (offer.startsWith("Offer:")) {
-                                        System.out.print("Do you want to accept this offer? (yes/no): ");
+                                        System.out.println("Do you want to accept this offer? (yes/no): ");
                                         String answer = scanner.nextLine();
                                         if (answer.equalsIgnoreCase("yes")) {
                                             output.writeUTF("acceptOffer");
