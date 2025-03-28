@@ -72,7 +72,7 @@ public class ClientHandler implements Runnable {
                     System.out.println("Customer registered with ID: " + id);
                     output.writeUTF("Registered successfully as customer.");
                     Customer_Features.handleCustomerFeatures(input, output, username, id);
-                } else {
+                } else if (role.equals("driver")) {
                     id=UberServer.addDriver(address, username, password, output);
                     System.out.println("Driver registered with ID: " + id);
                     output.writeUTF("Registered successfully as driver.");
@@ -125,6 +125,7 @@ public class ClientHandler implements Runnable {
                     UberServer.customerOutputs.put(username, output);
                     System.out.println("Updated customer connection for: " + username);
                 }
+
 
                 output.writeUTF("Login successful as " + role);
             } else {

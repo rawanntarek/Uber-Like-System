@@ -3,6 +3,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class UberClient {
     public static void main(String[] args) {
         try {
@@ -10,6 +12,7 @@ public class UberClient {
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
             DataInputStream input = new DataInputStream(socket.getInputStream());
             Scanner scanner = new Scanner(System.in);
+            AtomicBoolean offerPending = new AtomicBoolean(false);
 
             System.out.println(input.readUTF());
             String action = scanner.nextLine();
@@ -173,7 +176,7 @@ public class UberClient {
                                 socket.close();
                                 break;
                             }
-                            if(!msg.startsWith("Offer:")&&!msg.startsWith("Do you want")) {
+                            if(!msg.startsWith("Offer:")) {
                                 System.out.println("Customer Menu:");
                                 System.out.println("1. Request a ride");
                                 System.out.println("2. View ride status");
@@ -181,17 +184,36 @@ public class UberClient {
                                 System.out.println("4. Disconnect from server.");
                                 System.out.println("Choose an option: ");
                             }
+                            else
+                            {
+                                offerPending.set(true);
+                                System.out.println("Do you want to accept this offer? (yes/no): ");
+
+                            }
                         }
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
                     }
                 }).start();
-
-                int choice = 0;
+                int choice=0;
                 while (choice != 4) {
-                    String Choice = scanner.nextLine();
+                    String Input=scanner.nextLine();
+                    if(offerPending.get()) {
+                        if (Input.equalsIgnoreCase("yes")) {
+                            output.writeUTF("acceptOffer");
+                        } else if (Input.equalsIgnoreCase("no")) {
+                            output.writeUTF("declineOffer");
+                        }
+                        else
+                        {
+                            System.out.println("Invalid choice , please enter yes or no");
+                            continue;
+                        }
+                        offerPending.set(false);
+                        continue;
+                    }
                     try {
-                        choice = Integer.parseInt(Choice);
+                        choice = Integer.parseInt(Input);
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid please enter a number");
                         continue;
@@ -204,21 +226,7 @@ public class UberClient {
                                 System.out.print("Enter Destination: ");
                                 String dest = scanner.nextLine();
                                 output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
-                                while (true) {
-                                    String offer = input.readUTF();
-                                    System.out.println(offer);
-                                    if (offer.startsWith("Offer:")) {
-                                        System.out.println("Do you want to accept this offer? (yes/no): ");
-                                        String answer = scanner.nextLine();
-                                        if (answer.equalsIgnoreCase("yes")) {
-                                            output.writeUTF("acceptOffer");
-                                        } else if (answer.equalsIgnoreCase("no")) {
-                                            output.writeUTF("declineOffer");
-                                        }
-                                    } else {
-                                        break;
-                                    }
-                                }
+
                                 break;
                             case 2:
                                 output.writeUTF("viewStatus");

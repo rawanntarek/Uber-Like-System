@@ -135,10 +135,18 @@ public class Customer_Features {
             Offer next = new Offer(nextDriver, ride.getRideId(), nextFare);
             UberServer.pendingCustomerOffers.put(username, next);
 
-            output.writeUTF("Offer: " + next.getName() +
-                    " offered " + next.getFare() +
-                    " for your ride (Ride ID: " + next.getRideId() + ")");
-        } else {
+            double rating = 5.0;
+            for (ClientInfo driver : UberServer.drivers) {
+                if (driver.getUsername().equals(username)) {
+                    if (driver.getRating() != 0.0) {
+                        rating = driver.getRating();
+                    }
+                }
+            }
+            String offerMessage = "Offer:" + next.getName() + " Rating: " + rating + " offered " + next.getFare() +
+                    " for your ride (Ride ID: " + next.getRideId() + ")";
+            output.writeUTF(offerMessage);
+            System.out.println("Sent offer to customer: " + username);        } else {
             output.writeUTF("No more offers available for your ride.");
         }
     }

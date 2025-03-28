@@ -111,7 +111,7 @@ public class Driver_features {
 
             output.writeUTF("Offer:" + fare + " sent for ride ID: " + selectedRide.getRideId());
             System.out.println("Offer:" + username + " offered fare " + fare + " for Ride " + selectedRide.getRideId());
-            if (!UberServer.pendingCustomerOffers.containsKey(customerUsername)) {
+            if (!UberServer.pendingCustomerOffers.containsKey(customerUsername) && selectedRide.getAssignedDriver()==null) {
                 Offer offer = new Offer(username, selectedRide.getRideId(), fare);
                 UberServer.pendingCustomerOffers.put(customerUsername, offer);
                 DataOutputStream customerOut = UberServer.customerOutputs.get(customerUsername);
