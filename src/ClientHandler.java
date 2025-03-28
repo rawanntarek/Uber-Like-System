@@ -149,9 +149,13 @@ public class ClientHandler implements Runnable {
             System.out.println("Client disconnected.");
 
         } catch (IOException e) {
-            System.out.println("Error in client handler: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
+            System.out.println("client disconnected unexpectedly");
+
+        }
+        catch(Exception e)
+        {
+            System.out.println("Unexpected exception: " + e.getMessage());
+        }finally {
             try {
                 if (socket != null) socket.close();
             } catch (IOException e) {
