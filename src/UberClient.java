@@ -16,11 +16,29 @@ public class UberClient {
             String action = scanner.nextLine();
             output.writeUTF(action);
             System.out.print(input.readUTF());
-            String username = scanner.nextLine();
+            String username = "";
+            while(true) {
+                username = scanner.nextLine();
+                if(username.isEmpty()||username.length()<4) {
+                    System.out.println("Empty username or username less than 4 characters please retry");
+                }
+                else {
+                    break;
+                }
+            }
             output.writeUTF(username);
 
             System.out.print(input.readUTF());
-            String password = scanner.nextLine();
+            String password = "";
+            while(true) {
+                password = scanner.nextLine();
+                if(password.isEmpty()||password.length()<6) {
+                    System.out.println("Empty password or password less than 6 characters please retry");
+                }
+                else {
+                    break;
+                }
+            }
             output.writeUTF(password);
 
             if (action.equalsIgnoreCase("register")) {
@@ -42,14 +60,14 @@ public class UberClient {
                 System.out.println("1. Offer a fare for a ride request");
                 System.out.println("2. Send status updates of the ride (start/end)");
                 System.out.println("3. Disconnect from the server.");
-                System.out.print("Choose an option: ");
+                System.out.println("Choose an option: ");
             } else if (role.equals("customer")) {
                 System.out.println("\nCustomer Menu:");
                 System.out.println("1. Request a ride");
                 System.out.println("2. View ride status");
                 System.out.println("3. Rate your last ride");
                 System.out.println("4. Disconnect from server.");
-                System.out.print("Choose an option: ");
+                System.out.println("Choose an option: ");
             }
 
             if (role.equals("driver")) {
@@ -73,7 +91,7 @@ public class UberClient {
                                 System.out.println("1. Offer a fare for a ride request");
                                 System.out.println("2. Send status updates of the ride (start/end)");
                                 System.out.println("3. Disconnect from the server.");
-                                System.out.print("Choose an option: ");
+                                System.out.println("Choose an option: ");
                             }
                         }
                     } catch (IOException e) {
@@ -109,7 +127,19 @@ public class UberClient {
                                 break;
                             case 2:
                                 System.out.print("Enter ride status (start/end): ");
-                                String status = scanner.nextLine();
+                                String status ="";
+                                while(true)
+                                {
+                                    status = scanner.nextLine();
+                                    if(!status.equals("end")&&!status.equals("start"))
+                                    {
+                                        System.out.println("Invalid status please enter start or end");
+                                    }
+                                    else {
+                                        break;
+                                    }
+
+                                }
                                 output.writeUTF(status);
                                 break;
                             case 3:
