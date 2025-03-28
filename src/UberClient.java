@@ -77,15 +77,16 @@ public class UberClient {
                     try {
                         while (true) {
                             String serverMsg = input.readUTF();
+                            System.out.println("---------------------------------------");
+                            System.out.println(serverMsg);
+                            System.out.println("---------------------------------------");
+
                             if(serverMsg.equals("exit")) {
                                 System.out.println("Disconnected from server.");
                                 socket.close();
                                 System.exit(0);
                                 break;
                             }
-                            System.out.println("---------------------------------------");
-                            System.out.println(serverMsg);
-                            System.out.println("---------------------------------------");
 
                             // Only reprint menu if we're not in the middle of a fare offer process
                             if (!serverMsg.startsWith("Available pending rides:") && !serverMsg.startsWith("Enter the number")) {
@@ -173,7 +174,7 @@ public class UberClient {
                             System.out.println(msg);
                             System.out.println("---------------------------------------");
                             if(msg.equals("exit")) {
-                                System.out.println("Disconnected from server.");
+                                System.out.println("Disconnected from server ....");
                                 socket.close();
                                 System.exit(0);
                                 break;
@@ -194,7 +195,7 @@ public class UberClient {
                             }
                         }
                     } catch (IOException e) {
-                        System.out.println("Disconnected from server.");
+                        System.out.println("Disconnected from server catch.");
                     }
                 }).start();
                 int choice=0;
@@ -258,7 +259,7 @@ public class UberClient {
                                 output.writeUTF("exit");
                                 String serverResponse = input.readUTF();
                                 if (serverResponse.equals("exit")) {
-                                    System.out.println("Disconnected from server.");
+                                    System.out.println("Disconnected from server in case 4.");
                                     socket.close();
                                     System.exit(0);
                                 } else {

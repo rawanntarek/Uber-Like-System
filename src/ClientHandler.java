@@ -72,12 +72,13 @@ public class ClientHandler implements Runnable {
                     System.out.println("Customer registered with ID: " + id);
                     output.writeUTF("Registered successfully as customer.");
                     Customer_Features.handleCustomerFeatures(input, output, username, id);
+                    return;
                 } else if (role.equals("driver")) {
                     id=UberServer.addDriver(address, username, password, output);
                     System.out.println("Driver registered with ID: " + id);
                     output.writeUTF("Registered successfully as driver.");
                     Driver_features.handleDriverFeatures(input, output, username, id);
-
+                    return;
                 }
                 output.writeUTF("Registered successfully as " + role + ".");
 
@@ -128,31 +129,39 @@ public class ClientHandler implements Runnable {
 
 
                 output.writeUTF("Login successful as " + role);
+                if (role.equals("admin")) {
+                    System.out.println("Admin Connected");
+                    Admin_features.handleAdminFeatures(input,output);
+                    return;
+                }
+                else if (role.equals("customer")) {
+                    System.out.println("Customer Logged in");
+                    Customer_Features.handleCustomerFeatures(input, output, username, -1);
+                    return;
+
+                } else if (role.equals("driver")) {
+                    System.out.println("driver Logged in");
+                    Driver_features.handleDriverFeatures(input, output, username, -1);
+                    return;
+
+                }
             } else {
                 output.writeUTF("Invalid action. Disconnecting...");
                 return;
             }
 
-            if (role.equals("admin")) {
-                System.out.println("Admin Connected");
-                Admin_features.handleAdminFeatures(input,output);
-            }
-            else if (role.equals("customer")) {
-                System.out.println("Customer Logged in");
-                Customer_Features.handleCustomerFeatures(input, output, username, -1);
 
-            } else if (role.equals("driver")) {
-                System.out.println("driver Logged in");
-                Driver_features.handleDriverFeatures(input, output, username, -1);
-
-            }
 
             System.out.println("Client disconnected.");
 
         } catch (IOException e) {
-            System.out.println("client disconnected unexpectedly");
-
+            if (!socket.isClosed()) {
+                System.out.println("client disconnected unexpectedly");
+            } else {
+                System.out.println("client disconnected gracefully");
+            }
         }
+
         catch(Exception e)
         {
             System.out.println("Unexpected exception: " + e.getMessage());

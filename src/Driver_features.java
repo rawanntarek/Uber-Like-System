@@ -43,6 +43,8 @@ public class Driver_features {
                 }
                 
                 output.writeUTF("exit");
+                System.out.println("driver " + username + " has disconnected.");
+
                 break;
             } else {
                 output.writeUTF("Unknown command.");

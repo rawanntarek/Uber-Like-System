@@ -25,6 +25,8 @@ public class Customer_Features {
                     output.writeUTF("You cannot disconnect during an ongoing ride.");
                 } else {
                     output.writeUTF("exit");
+                    System.out.println("Customer " + username + " has disconnected.");
+
                     break;
                 }
             }else {
