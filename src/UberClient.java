@@ -73,7 +73,7 @@ public class UberClient {
             }
 
             if (role.equals("driver")) {
-                Thread listenerThread = new Thread(() -> {
+                Thread thread = new Thread(() -> {
                     try {
                         while (true) {
                             String serverMsg = input.readUTF();
@@ -100,7 +100,7 @@ public class UberClient {
                         System.out.println("Disconnected from server.");
                     }
                 });
-                listenerThread.start();
+                thread.start();
 
                 while (true) {
                     int choice = 0;
@@ -178,7 +178,11 @@ public class UberClient {
                                 System.exit(0);
                                 break;
                             }
+<<<<<<< Updated upstream
                             if(!msg.startsWith("Offer:")) {
+=======
+                            if(!msg.startsWith("Offer:") && !msg.startsWith("Do you want") && !msg.startsWith("Enter")) {
+>>>>>>> Stashed changes
                                 System.out.println("Customer Menu:");
                                 System.out.println("1. Request a ride");
                                 System.out.println("2. View ride status");
