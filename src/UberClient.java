@@ -70,14 +70,14 @@ public class UberClient {
             }
 
             if (role.equals("driver")) {
-
-                new Thread(() -> {
+                Thread listenerThread = new Thread(() -> {
                     try {
                         while (true) {
                             String serverMsg = input.readUTF();
                             if(serverMsg.equals("exit")) {
                                 System.out.println("Disconnected from server.");
                                 socket.close();
+                                System.exit(0);
                                 break;
                             }
                             System.out.println("---------------------------------------");
@@ -96,7 +96,8 @@ public class UberClient {
                     } catch (IOException e) {
                         System.out.println("Disconnected from server.");
                     }
-                }).start();
+                });
+                listenerThread.start();
 
                 while (true) {
                     int choice = 0;
@@ -147,7 +148,7 @@ public class UberClient {
                                 if (serverResponse.equals("exit")) {
                                     System.out.println("Disconnected from server.");
                                     socket.close();
-                                    return;
+                                    System.exit(0);
                                 } else {
                                     System.out.println(serverResponse);
                                 }
@@ -171,6 +172,7 @@ public class UberClient {
                             if(msg.equals("exit")) {
                                 System.out.println("Disconnected from server.");
                                 socket.close();
+                                System.exit(0);
                                 break;
                             }
                             if(!msg.startsWith("Offer:")&&!msg.startsWith("Do you want")) {
@@ -250,7 +252,7 @@ public class UberClient {
                                 if (serverResponse.equals("exit")) {
                                     System.out.println("Disconnected from server.");
                                     socket.close();
-                                    return;
+                                    System.exit(0);
                                 } else {
                                     System.out.println(serverResponse);
                                 }
