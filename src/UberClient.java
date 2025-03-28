@@ -81,12 +81,17 @@ public class UberClient {
                     }
                 }).start();
 
-                int choice = 0;
                 while (true) {
-                    try {
-                        choice = scanner.nextInt();
-                        scanner.nextLine();
+                    int choice = 0;
+                    String Choice = scanner.nextLine();
 
+                    try {
+                        choice = Integer.parseInt(Choice);}
+                    catch (NumberFormatException e) {
+                        System.out.println("Invalid please enter a number");
+                        continue;
+                    }
+                    try {
                         switch (choice) {
                             case 1:
                                 output.writeUTF("fare: 0"); // Initial request to get list of rides
@@ -119,10 +124,10 @@ public class UberClient {
                                 }
                                 break;
                             default:
-                                System.out.println("Invalid choice");
+                                System.out.println("Invalid choice , please enter 1 or 2 or 3");
                         }
                     } catch (Exception e) {
-                        System.out.println("Error: " + e.getMessage());
+                        System.out.println(e.getMessage());
                     }
                 }
             }
@@ -155,74 +160,80 @@ public class UberClient {
 
                 int choice = 0;
                 while (choice != 4) {
-                    choice = scanner.nextInt();
-                    scanner.nextLine();
-
-                    switch (choice) {
-                        case 1:
-                            System.out.print("Enter Pickup Location: ");
-                            String pickup = scanner.nextLine();
-                            System.out.print("Enter Destination: ");
-                            String dest = scanner.nextLine();
-                            output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
-                            while(true)
-                            {
-                                String offer=input.readUTF();
-                                System.out.println(offer);
-                                if (offer.startsWith("Offer:")) {
-                                    System.out.print("Do you want to accept this offer? (yes/no): ");
-                                    String answer = scanner.nextLine();
-                                    if(answer.equalsIgnoreCase("yes"))
-                                    {
-                                        output.writeUTF("acceptOffer");
-                                    } else if (answer.equalsIgnoreCase("no")) {
-                                        output.writeUTF("declineOffer");
+                    String Choice = scanner.nextLine();
+                    try {
+                        choice = Integer.parseInt(Choice);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid please enter a number");
+                        continue;
+                    }
+                    try {
+                        switch (choice) {
+                            case 1:
+                                System.out.print("Enter Pickup Location: ");
+                                String pickup = scanner.nextLine();
+                                System.out.print("Enter Destination: ");
+                                String dest = scanner.nextLine();
+                                output.writeUTF("pickupLocation: " + pickup + "\ndestination: " + dest);
+                                while (true) {
+                                    String offer = input.readUTF();
+                                    System.out.println(offer);
+                                    if (offer.startsWith("Offer:")) {
+                                        System.out.print("Do you want to accept this offer? (yes/no): ");
+                                        String answer = scanner.nextLine();
+                                        if (answer.equalsIgnoreCase("yes")) {
+                                            output.writeUTF("acceptOffer");
+                                        } else if (answer.equalsIgnoreCase("no")) {
+                                            output.writeUTF("declineOffer");
+                                        }
+                                    } else {
+                                        break;
                                     }
                                 }
-                                else {
-                                    break;
+                                break;
+                            case 2:
+                                output.writeUTF("viewStatus");
+                                break;
+                            case 3:
+                                System.out.print("Enter overall rating (1-5): ");
+                                double overall = scanner.nextDouble();
+                                System.out.print("Enter driving skill rating (1-5): ");
+                                double drivingSkill = scanner.nextDouble();
+                                System.out.print("Enter good music rating (1-5): ");
+                                double music = scanner.nextDouble();
+                                System.out.print("Enter friendliness rating (1-5): ");
+                                double friendliness = scanner.nextDouble();
+                                scanner.nextLine();
+
+                                if (overall >= 1 && overall <= 5 &&
+                                        drivingSkill >= 1 && drivingSkill <= 5 &&
+                                        music >= 1 && music <= 5 &&
+                                        friendliness >= 1 && friendliness <= 5) {
+                                    output.writeUTF("rate:" + overall + "," + drivingSkill + "," + music + "," + friendliness);
+                                } else {
+                                    System.out.println("rating must be between 1 and 5.");
                                 }
-                            }
-                            break;
-                        case 2:
-                            output.writeUTF("viewStatus");
-                            break;
-                        case 3:
-                            System.out.print("Enter overall rating (1-5): ");
-                            double overall = scanner.nextDouble();
-                            System.out.print("Enter driving skill rating (1-5): ");
-                            double drivingSkill = scanner.nextDouble();
-                            System.out.print("Enter good music rating (1-5): ");
-                            double music = scanner.nextDouble();
-                            System.out.print("Enter friendliness rating (1-5): ");
-                            double friendliness = scanner.nextDouble();
-                            scanner.nextLine();
 
-                            if (overall >= 1 && overall <= 5 &&
-                                    drivingSkill >= 1 && drivingSkill <= 5 &&
-                                    music >= 1 && music <= 5 &&
-                                    friendliness >= 1 && friendliness <= 5) {
-                                output.writeUTF("rate:" + overall + "," + drivingSkill + "," + music + "," + friendliness);
-                            } else {
-                                System.out.println("rating must be between 1 and 5.");
-                            }
-
-                            break;
-                        case 4:
-                            output.writeUTF("exit");
-                            String serverResponse = input.readUTF();
-                            if (serverResponse.equals("exit")) {
-                                System.out.println("Disconnected from server.");
-                                socket.close();
-                                return;
-                            } else {
-                                System.out.println(serverResponse);
-                            }
-                            break;
-                        default:
-                            System.out.println("Invalid choice");
+                                break;
+                            case 4:
+                                output.writeUTF("exit");
+                                String serverResponse = input.readUTF();
+                                if (serverResponse.equals("exit")) {
+                                    System.out.println("Disconnected from server.");
+                                    socket.close();
+                                    return;
+                                } else {
+                                    System.out.println(serverResponse);
+                                }
+                                break;
+                            default:
+                                System.out.println("Invalid choice please enter 1 or 2 or 3 or 4");
+                        }
+                    }catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
                 }
+
             }
             else if (role.equals("admin")) {
                 int choice = 0;
@@ -232,8 +243,13 @@ public class UberClient {
                     System.out.println("1. View Statistics");
                     System.out.println("2. Disconnect from server.");
                     System.out.println("Choose an option: ");
-                    choice = scanner.nextInt();
-                    scanner.nextLine();
+                    String Choice = scanner.nextLine();
+                    try {
+                        choice = Integer.parseInt(Choice);}
+                    catch (NumberFormatException e) {
+                        System.out.println("Invalid please enter a number");
+                        continue;
+                    }
                     switch (choice) {
                         case 1:
                             output.writeUTF("viewStats");
@@ -248,6 +264,9 @@ public class UberClient {
                         case 2:
                             output.writeUTF("exit");
                             break;
+                        default:
+                            System.out.println("Invalid choice please enter 1 or 2");
+
                     }
                 }
             }
